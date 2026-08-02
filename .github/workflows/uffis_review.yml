@@ -1,0 +1,72 @@
+name: UFFIS review
+
+# Lets a human confirm or reject a pending reading, entirely through a form on
+# github.com — no command line needed. This is the missing half of the pipeline:
+# run_uffis_pipeline.py queues readings, this workflow is how a person actually
+# acts on them.
+#
+# How to use:
+#   1. Open PENDING_REVIEWS.md in this repo to see what's waiting and its review_id.
+#   2. Go to the Actions tab -> "UFFIS review" -> "Run workflow".
+#   3. Fill in the form that appears (review_id, decision, your name/role, notes).
+#   4. Click the green "Run workflow" button.
+#   5. Refresh PENDING_REVIEWS.md after ~30s — the row you reviewed will be gone
+#      from the pending list, and (if CONFIRMED) alert_dissemination_log will have
+#      new rows for it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      review_id:
+        description: "review_id from PENDING_REVIEWS.md (a number, e.g. 20)"
+        required: true
+        type: string
+      decision:
+        description: "Confirm it (real, goes to public channels) or reject it (false alarm, nothing goes out)"
+        required: true
+        type: choice
+        options:
+          - CONFIRMED
+          - REJECTED
+      reviewer_name:
+        description: 'Who is reviewing this, e.g. "Traffic Police - Zone 3" or "Field Staff - K. Menon"'
+        required: true
+        type: string
+      notes:
+        description: "Optional: what you saw/checked"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  record-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install --break-system-packages pandas
+
+      - name: Record the decision
+        run: |
+          python3 review_pending.py \
+            --review-id "${{ inputs.review_id }}" \
+            --decision "${{ inputs.decision }}" \
+            --reviewer "${{ inputs.reviewer_name }}" \
+            --notes "${{ inputs.notes }}"
+
+      - name: Commit updated database + pending list
+        run: |
+          git config user.name "uffis-review-bot"
+          git config user.email "actions@github.com"
+          git add uffis_data.db PENDING_REVIEWS.md
+          git diff --quiet --cached || git commit -m "Review: ${{ inputs.decision }} review_id=${{ inputs.review_id }} by ${{ inputs.reviewer_name }}"
+          git push

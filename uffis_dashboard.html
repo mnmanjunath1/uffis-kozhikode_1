@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UFFIS · Kozhikode Flash-Flood Early Warning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    --bg:#F3F6FA;
+    --panel:#FFFFFF;
+    --panel-alt:#F5F8FB;
+    --border:#DEE6EE;
+    --border-soft:#E9EEF3;
+    --ink:#16202C;
+    --muted:#5B6B7E;
+    --muted-dim:#8B98A8;
+    --teal:#0E7C86;
+    --teal-dim:#0B5F67;
+    --green:#178A52;
+    --yellow:#B7860B;
+    --orange:#C45E0A;
+    --red:#C4302B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(14,124,134,0.06), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(196,48,43,0.04), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+
+  /* ---- Top bar ---- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 40px; border-bottom:1px solid var(--border);
+    background:rgba(255,255,255,0.75); backdrop-filter:blur(6px);
+    position:sticky; top:0; z-index:50;
+  }
+  .brand{display:flex; align-items:center; gap:14px;}
+  .brand-mark{
+    width:38px;height:38px;border-radius:9px;
+    background:linear-gradient(135deg, var(--teal), var(--teal-dim));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Space Grotesk',sans-serif;font-weight:700;color:#08221F;font-size:15px;
+    flex-shrink:0;
+  }
+  .brand-text h1{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;margin:0;letter-spacing:0.2px;}
+  .brand-text p{margin:2px 0 0;font-size:12px;color:var(--muted);}
+  .topbar-right{display:flex;align-items:center;gap:22px;font-size:12px;color:var(--muted);}
+  .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px;box-shadow:0 0 8px var(--green);}
+
+  /* ---- Tab bar ---- */
+  .tabbar{border-bottom:1px solid var(--border);background:rgba(255,255,255,0.6);}
+  .tabbar-inner{max-width:1320px;margin:0 auto;padding:0 40px;display:flex;gap:6px;}
+  .tab-btn{
+    background:none;border:none;color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;
+    padding:13px 18px;cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;gap:8px;
+  }
+  .tab-btn:hover{color:var(--ink);}
+  .tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);}
+  .tab-badge{
+    background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;
+    display:none;
+  }
+  .tab-badge.show{display:inline-block;}
+
+  /* ---- Live submit form + action buttons (Alerts tab) ---- */
+  .submit-row{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;}
+  .submit-btn{
+    background:var(--teal);color:var(--bg);border:none;border-radius:8px;padding:10px 18px;
+    font-family:'Inter',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;
+  }
+  .submit-btn:hover{filter:brightness(1.08);}
+  .submit-preview{font-size:12px;color:var(--muted);align-self:center;}
+  .submit-preview b{font-family:'IBM Plex Mono',monospace;}
+  .action-btn{
+    border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;
+    margin-right:5px;font-family:'Inter',sans-serif;
+  }
+  .action-btn.confirm{background:rgba(34,197,94,0.15);color:var(--green);}
+  .action-btn.confirm:hover{background:rgba(34,197,94,0.3);}
+  .action-btn.reject{background:rgba(233,72,63,0.15);color:var(--red);}
+  .action-btn.reject:hover{background:rgba(233,72,63,0.3);}
+  .row-flash{animation:flashRow 1s ease;}
+  @keyframes flashRow{0%{background:rgba(34,211,199,0.25);}100%{background:transparent;}}
+
+  .wrap{max-width:1320px;margin:0 auto;padding:36px 40px 0;}
+
+  /* ---- Stat strip ---- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:34px;}
+  .stat-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    padding:20px 22px;position:relative;overflow:hidden;
+    box-shadow:0 1px 3px rgba(22,32,44,0.06), 0 1px 2px rgba(22,32,44,0.04);
+  }
+  .stat-card::before{
+    content:"";position:absolute;top:0;left:0;width:3px;height:100%;
+    background:var(--accent,var(--teal));
+  }
+  .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.9px;color:var(--muted);margin-bottom:10px;}
+  .stat-value{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;line-height:1;}
+  .stat-sub{font-size:12px;color:var(--muted-dim);margin-top:8px;}
+
+  /* ---- Section headers ---- */
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;}
+  .section-eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted-dim);}
+  .section-note{font-size:12px;color:var(--muted);max-width:460px;text-align:right;}
+
+  /* ---- Fusion console (hero/signature) ---- */
+  .console{
+    background:linear-gradient(180deg, var(--panel-alt), var(--panel));
+    border:1px solid var(--border);border-radius:18px;padding:28px 30px;margin-bottom:34px;
+    position:relative;
+    box-shadow:0 1px 3px rgba(22,32,44,0.06), 0 1px 2px rgba(22,32,44,0.04);
+  }
+  .console-grid{display:grid;grid-template-columns:1.15fr 0.85fr;gap:34px;margin-top:18px;}
+  .console-controls label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}
+  .control-row{margin-bottom:20px;}
+  .control-row.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  select, input[type=range]{width:100%;}
+  select{
+    background:var(--bg);color:var(--ink);border:1px solid var(--border);border-radius:8px;
+    padding:9px 10px;font-family:'Inter',sans-serif;font-size:13px;
+  }
+  input[type=range]{
+    -webkit-appearance:none;height:5px;border-radius:3px;
+    background:linear-gradient(90deg, var(--teal-dim), var(--teal));outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:#fff;border:3px solid var(--teal);cursor:pointer;
+  }
+  .slider-value{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px;}
+  .slider-value span{font-family:'IBM Plex Mono',monospace;color:var(--ink);}
+
+  .formula-box{
+    background:var(--bg);border:1px solid var(--border-soft);border-radius:10px;
+    padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);
+    line-height:1.7;margin-bottom:22px;
+  }
+  .formula-box .hl{color:var(--teal);}
+
+  .readout{
+    border:1px solid var(--border);border-radius:14px;padding:24px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:var(--bg);text-align:center;transition:box-shadow .3s ease;
+  }
+  .readout-score{font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:700;line-height:1;margin-bottom:6px;}
+  .readout-band{
+    font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;
+    padding:6px 16px;border-radius:20px;margin-top:10px;
+  }
+  .readout-detail{margin-top:16px;font-size:12px;color:var(--muted);line-height:1.6;}
+  .readout-warning{
+    margin-top:14px;font-size:11.5px;color:var(--orange);border:1px solid rgba(245,135,46,0.35);
+    background:rgba(245,135,46,0.08);border-radius:8px;padding:8px 10px;display:none;
+  }
+  .band-bar{display:flex;height:6px;border-radius:4px;overflow:hidden;margin-top:18px;width:100%;}
+  .band-bar div{flex:1;}
+
+  /* ---- Panels ---- */
+  .grid-2{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;margin-bottom:22px;align-items:start;}
+  .panel{
+    background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px 24px;
+    box-shadow:0 1px 3px rgba(22,32,44,0.06), 0 1px 2px rgba(22,32,44,0.04);
+  }
+  .filters{display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+  .filter-group{display:flex;flex-direction:column;gap:5px;}
+  .filter-group span{font-size:10.5px;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted-dim);}
+  .radio-set{display:flex;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;}
+  .radio-set label{
+    font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;color:var(--muted);
+  }
+  .radio-set input{display:none;}
+  .radio-set input:checked + span{color:var(--bg);}
+  .radio-set label.active{background:var(--teal);color:var(--bg);}
+  .mini-select{width:170px;}
+  .conf-slider{width:170px;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  thead th{
+    text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted-dim);
+    padding:8px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel);
+  }
+  tbody td{padding:9px 10px;border-bottom:1px solid var(--border-soft);vertical-align:top;}
+  tbody tr:hover{background:var(--panel-alt);}
+  .table-scroll{max-height:300px;overflow-y:auto;border-radius:10px;}
+  .headline-cell{max-width:340px;position:relative;cursor:help;}
+  .headline-cell .full{display:none;}
+  .tag{
+    display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600;
+  }
+  .tag.flood{background:rgba(233,72,63,0.15);color:var(--red);}
+  .tag.notflood{background:rgba(34,197,94,0.15);color:var(--green);}
+  .source-real{color:var(--teal);font-size:11px;}
+  .source-synth{color:var(--muted-dim);font-size:11px;}
+
+  .legend-row{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);}
+  .legend-dot{width:9px;height:9px;border-radius:50%;}
+
+  .model-row{display:grid;grid-template-columns:120px 1fr 40px;align-items:center;gap:10px;margin-bottom:12px;}
+  .model-name{font-size:12px;color:var(--muted);}
+  .bar-track{background:var(--bg);border-radius:6px;height:9px;overflow:hidden;border:1px solid var(--border-soft);}
+  .bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg, var(--teal-dim), var(--teal));}
+  .model-val{font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:right;}
+
+  .feat-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+  .feat-word{font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:130px;color:var(--muted);flex-shrink:0;}
+  .feat-bar-wrap{flex:1;background:var(--bg);border-radius:4px;height:8px;position:relative;border:1px solid var(--border-soft);overflow:hidden;}
+  .feat-bar{height:100%;position:absolute;top:0;}
+  .feat-bar.pos{background:var(--red);left:50%;}
+  .feat-bar.neg{background:var(--green);right:50%;}
+  .feat-mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border);}
+
+  #map{height:480px;border-radius:14px;border:1px solid var(--border);}
+  .map-wrap{margin-bottom:22px;}
+  .map-legend{display:flex;gap:18px;margin-top:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);}
+
+  footer{max-width:1320px;margin:40px auto 0;padding:20px 40px;border-top:1px solid var(--border);
+    font-size:11.5px;color:var(--muted-dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+  @media (max-width: 980px){
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .console-grid{grid-template-columns:1fr;}
+    .grid-2{grid-template-columns:1fr;}
+    .topbar,.wrap{padding-left:18px;padding-right:18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">UF</div>
+    <div class="brand-text">
+      <h1>UFFIS · Kozhikode</h1>
+      <p>Flash-Flood Early Warning &mdash; GeoAI Analytics Dashboard</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span id="pipelineStatus"><span class="live-dot" id="pipelineDot"></span><span id="pipelineText">Checking for live pipeline data&hellip;</span></span>
+    <span class="mono" id="asof"></span>
+  </div>
+</div>
+
+<div class="tabbar">
+  <div class="tabbar-inner">
+    <button class="tab-btn active" data-tab="overview">Overview</button>
+    <button class="tab-btn" data-tab="alerts">Alerts <span class="tab-badge" id="alertsBadge"></span></button>
+  </div>
+</div>
+
+<div class="wrap" id="tab-overview">
+
+  <div class="stats" id="statStrip"></div>
+
+  <!-- ===== Map (moved up front) ===== -->
+  <div class="panel map-wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">Corporation boundary (dissolved) + 19 monitored localities</div>
+        <div class="section-title">Kozhikode coverage map</div>
+      </div>
+      <div class="section-note">Vellayil, Kozhikode Beach and West Hill coordinates corrected from the source pipeline's original coastline offset.</div>
+    </div>
+    <div id="map" style="height:480px;"></div>
+    <div class="map-legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>Monitored locality</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Locality matched in a flood-risk headline</div>
+    </div>
+  </div>
+
+  <!-- ===== Fusion Console (signature element) ===== -->
+  <div class="console">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">Live simulator</div>
+        <div class="section-title">Fusion-score console &mdash; alert band vs. weight assumption</div>
+      </div>
+      <div class="section-note">Drag <span class="mono">w_nlp</span> to see how close the current 0.45 setting sits to a band flip.</div>
+    </div>
+
+    <div class="console-grid">
+      <div class="console-controls">
+        <div class="formula-box">
+          fused = <span class="hl">w_nlp</span>·nlp_score + <span class="hl">w_rain</span>·rain_score + corroboration(8) + credibility(10) + gdacs(10) + location(10)
+        </div>
+
+        <div class="control-row">
+          <label>Scenario</label>
+          <select id="scenarioSelect"></select>
+        </div>
+
+        <div class="control-row">
+          <label>NLP weight &nbsp;(w_nlp)</label>
+          <input type="range" id="wNlp" min="0.20" max="0.65" step="0.01" value="0.45">
+          <div class="slider-value"><span>current model default: 0.45</span><span id="wNlpVal">0.45</span></div>
+        </div>
+
+        <div class="control-row">
+          <label>Rain weight &nbsp;(w_rain)</label>
+          <input type="range" id="wRain" min="0.10" max="0.55" step="0.01" value="0.30">
+          <div class="slider-value"><span>current model default: 0.30</span><span id="wRainVal">0.30</span></div>
+        </div>
+      </div>
+
+      <div class="readout">
+        <div class="stat-label">Fused score</div>
+        <div class="readout-score" id="readoutScore">--</div>
+        <div class="readout-band" id="readoutBand">--</div>
+        <div class="band-bar">
+          <div style="background:var(--green)"></div>
+          <div style="background:var(--yellow)"></div>
+          <div style="background:var(--orange)"></div>
+          <div style="background:var(--red)"></div>
+        </div>
+        <div class="readout-detail" id="readoutDetail"></div>
+        <div class="readout-warning" id="readoutWarning">⚠ This scenario flips ORANGE → RED inside the tested weight range (0.35&ndash;0.55) &mdash; the band is not fully weight-stable here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Headlines + classifiers ===== -->
+  <div class="grid-2">
+    <div class="panel">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Table 4.2 · n=64</div>
+          <div class="section-title">Headline confidence over time</div>
+        </div>
+      </div>
+
+      <div class="filters">
+        <div class="filter-group">
+          <span>Class</span>
+          <div class="radio-set" id="classRadio">
+            <label class="active" data-val="all">All</label>
+            <label data-val="1">Flood-risk</label>
+            <label data-val="0">Not flood</label>
+          </div>
+        </div>
+        <div class="filter-group">
+          <span>Locality</span>
+          <select class="mini-select" id="localitySelect"></select>
+        </div>
+        <div class="filter-group">
+          <span>Min. NLP confidence: <span class="mono" id="confLabel">0</span></span>
+          <input type="range" class="conf-slider" id="confSlider" min="0" max="65" value="0" step="1">
+        </div>
+      </div>
+
+      <canvas id="trendChart" height="130"></canvas>
+
+      <div class="legend-row">
+        <div class="legend-item"><span class="legend-dot" style="background:rgba(196,48,43,0.7)"></span>Bar = headlines that day (red-tinted if any were flood-risk)</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>Line = avg NLP confidence that day</div>
+      </div>
+
+      <div class="table-scroll" style="margin-top:18px;">
+        <table>
+          <thead><tr><th>Date</th><th>Headline</th><th>Class</th><th>Conf.</th><th>Source</th></tr></thead>
+          <tbody id="headlineRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel" style="margin-bottom:20px;">
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow">5-fold stratified CV</div>
+            <div class="section-title">Classifier comparison</div>
+          </div>
+        </div>
+        <div id="modelBars"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <div class="section-eyebrow">Logistic Regression coefficients</div>
+            <div class="section-title">Top signal words</div>
+          </div>
+        </div>
+        <div id="featBars"></div>
+        <div class="legend-row">
+          <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>Pushes toward flood-risk</div>
+          <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>Pushes toward not flood</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="wrap" id="tab-alerts" style="display:none;">
+
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">Recovered by the locality-extraction fix (Section 9a)</div>
+        <div class="section-title">City-wide alerts (no specific locality named)</div>
+      </div>
+      <div class="section-note">These headlines previously had <span class="mono">NaN</span> in Matched_Localities and were invisible to any locality-level view. They still can't be plotted as a single point, but they're not silently dropped anymore.</div>
+    </div>
+    <div class="table-scroll" style="max-height:260px;">
+      <table>
+        <thead><tr><th>Date</th><th>Headline</th><th>Conf.</th></tr></thead>
+        <tbody id="cityWideRows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">Live simulator, same fusion formula as Section 7</div>
+        <div class="section-title">Submit a new reading</div>
+      </div>
+      <div class="section-note">GREEN/YELLOW readings are logged informational-only and skip the queue entirely, exactly like the real pipeline.</div>
+    </div>
+    <div class="submit-row">
+      <div class="filter-group">
+        <span>Locality</span>
+        <select class="mini-select" id="newLocality"></select>
+      </div>
+      <div class="filter-group">
+        <span>NLP score: <span class="mono" id="newNlpVal">60</span></span>
+        <input type="range" class="conf-slider" id="newNlp" min="0" max="100" value="60">
+      </div>
+      <div class="filter-group">
+        <span>Rain score: <span class="mono" id="newRainVal">30</span></span>
+        <input type="range" class="conf-slider" id="newRain" min="0" max="100" value="30">
+      </div>
+      <button class="submit-btn" id="submitReading">Compute &amp; submit</button>
+      <div class="submit-preview" id="submitPreview"></div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="grid-template-columns:1fr 1fr;">
+    <div class="panel">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Section 10a &mdash; click Confirm/Reject on a pending row</div>
+          <div class="section-title">Human review queue</div>
+        </div>
+      </div>
+      <div class="table-scroll" style="max-height:320px;">
+        <table>
+          <thead><tr><th>Locality</th><th>Score</th><th>Band</th><th>Status</th><th>Reviewer</th><th>Action</th></tr></thead>
+          <tbody id="reviewQueueRows"></tbody>
+        </table>
+      </div>
+      <div class="legend-row">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span>PENDING_REVIEW</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span>CONFIRMED</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--muted-dim)"></span>REJECTED</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--teal)"></span>AUTO_INFORMATIONAL</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-head">
+        <div>
+          <div class="section-eyebrow">Section 10b &mdash; updates live as you confirm/reject</div>
+          <div class="section-title">Dissemination log</div>
+        </div>
+      </div>
+      <div class="table-scroll" style="max-height:320px;">
+        <table>
+          <thead><tr><th>Tier</th><th>Channel</th><th>Message</th></tr></thead>
+          <tbody id="disseminationRows"></tbody>
+        </table>
+      </div>
+      <div class="section-note" style="text-align:left;margin-top:10px;">Only <span class="mono">CONFIRMED</span> readings reach this log. Reject one and watch nothing get added here &mdash; the gate works.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>UFFIS Kozhikode &mdash; consolidated notebook, Section 3&ndash;9 · all figures computed live from UFFIS_training_data.csv, no hard-coded metrics</span>
+  <span class="mono" id="genstamp"></span>
+</footer>
+
+<script>
+const HEADLINES = [{"Title": "IMD issues orange alert for Kozhikode as monsoon intensifies across northern Kerala districts", "Label": 1, "Date": "2025-05-23", "SourceType": "real-dated", "NLP_Confidence": 62.8, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode coast placed under red alert as early monsoon brings high wave warnings", "Label": 1, "Date": "2025-05-26", "SourceType": "real-dated", "NLP_Confidence": 62.2, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Southwest monsoon arrives over Kerala eight days early, heaviest since 2009, Kozhikode among affected coastal districts", "Label": 1, "Date": "2025-05-24", "SourceType": "real-dated", "NLP_Confidence": 62.0, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Thousands evacuated from low-lying Kozhikode neighbourhoods as monsoon flooding overwhelms drainage systems", "Label": 1, "Date": "2025-06-15", "SourceType": "real-dated", "NLP_Confidence": 60.7, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Dam authorities release water from key reservoirs as Kerala monsoon rainfall intensifies, Kozhikode on alert", "Label": 1, "Date": "2025-07-02", "SourceType": "real-dated", "NLP_Confidence": 62.9, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "IMD red warning issued for Kozhikode and Wayanad districts as extremely heavy rainfall recorded", "Label": 1, "Date": "2026-07-07", "SourceType": "real-dated", "NLP_Confidence": 62.7, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": "Wayanad"}, {"Title": "Automatic weather stations in Kozhikode district record some of the season's heaviest rainfall readings", "Label": 1, "Date": "2026-07-07", "SourceType": "real-dated", "NLP_Confidence": 59.5, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Schools shut in Kozhikode and Wayanad as IMD issues yellow alert across eleven Kerala districts", "Label": 1, "Date": "2026-07-08", "SourceType": "real-dated", "NLP_Confidence": 63.4, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": "Wayanad"}, {"Title": "Chathamangalam, Mavoor and Kodiyathur face flood threat as Chaliyar and other rivers overflow banks", "Label": 1, "Date": "2026-07-08", "SourceType": "real-dated", "NLP_Confidence": 62.0, "Matched_Localities": "", "Matched_Localities_Fixed": "Mavoor Road; Chathamangalam; Kodiyathur", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Authorities open shutters of Oorkadavu regulator-cum-bridge as river levels rise near Kozhikode", "Label": 1, "Date": "2026-07-08", "SourceType": "real-dated", "NLP_Confidence": 61.0, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kerala remains on alert as yellow warning extends toward Kozhikode and Idukki through July 23", "Label": 1, "Date": "2026-07-18", "SourceType": "real-dated", "NLP_Confidence": 61.4, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": "Idukki"}, {"Title": "Thunderstorms and frequent lightning forecast to continue over Kozhikode district into next week", "Label": 1, "Date": "2026-07-18", "SourceType": "real-dated", "NLP_Confidence": 60.4, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Flash floods reported in Kallai after overnight downpour", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 62.4, "Matched_Localities": "Kallai", "Matched_Localities_Fixed": "Kallai", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Waterlogging cuts off Mavoor Road, traffic diverted for hours", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 60.8, "Matched_Localities": "Mavoor Road", "Matched_Localities_Fixed": "Mavoor Road", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "KSDMA warns of flash flood risk in Kozhikode for next 48 hours", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 61.1, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Rescue operations underway as Chevayur residents stranded by rising water", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 61.5, "Matched_Localities": "Chevayur", "Matched_Localities_Fixed": "Chevayur", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Several homes submerged in Beypore after river overflow", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 61.0, "Matched_Localities": "Beypore", "Matched_Localities_Fixed": "Beypore", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Heavy downpour triggers landslide warning near Kozhikode hills", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 62.7, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "NDRF team deployed for flood rescue operations in Kozhikode district", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 63.2, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Drainage overflow floods SM Street market area during peak monsoon spell", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 59.4, "Matched_Localities": "SM Street", "Matched_Localities_Fixed": "SM Street", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Kozhikode Medical College Road inundated, ambulances rerouted through service lanes", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 57.1, "Matched_Localities": "Medical College", "Matched_Localities_Fixed": "Medical College", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "District collector declares school holiday for Kozhikode due to flood threat", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 61.5, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Railway services disrupted as tracks near Kozhikode go under water", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 61.5, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kerala Disaster Management Authority activates flood control room in Kozhikode", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 60.0, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Puthiyara residents wade through knee-deep water after sudden cloudburst", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 60.2, "Matched_Localities": "Puthiyara", "Matched_Localities_Fixed": "Puthiyara", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Evacuation ordered in Ramanattukara amid flood alert", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 61.6, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Kozhikode Corporation deploys emergency pumps to clear waterlogged roads overnight", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 58.0, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Red alert issued for Kozhikode as dam shutters opened amid heavy inflow", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 62.9, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Vellayil low-lying areas report ankle-deep waterlogging after continuous rain", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 61.1, "Matched_Localities": "Vellayil", "Matched_Localities_Fixed": "Vellayil", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Traffic snarls on Mini Bypass as stormwater drains fail to cope with downpour", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 60.4, "Matched_Localities": "Mini Bypass", "Matched_Localities_Fixed": "Mini Bypass", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Fire and rescue services respond to flooded homes near Kottooli", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 62.1, "Matched_Localities": "Kottooli", "Matched_Localities_Fixed": "Kottooli", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Coastal fishing suspended near Kozhikode as high waves accompany flood warning", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 61.4, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode district administration sets up relief camps as rain-related flooding spreads", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 59.9, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Landslide risk prompts overnight evacuation advisory for hilly parts of Kozhikode district", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 62.9, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Power supply disrupted in several Kozhikode wards as flood water reaches transformers", "Label": 1, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 60.4, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Beypore International Water Festival opens with kayaking, sailing and cultural events across three venues", "Label": 0, "Date": "2025-01-04", "SourceType": "real-dated", "NLP_Confidence": 38.3, "Matched_Localities": "Beypore", "Matched_Localities_Fixed": "Beypore", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Kerala Literature Festival draws hundreds of thousands to Kozhikode Beach for its eighth edition", "Label": 0, "Date": "2025-01-23", "SourceType": "real-dated", "NLP_Confidence": 34.8, "Matched_Localities": "Kozhikode Beach", "Matched_Localities_Fixed": "Kozhikode Beach", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Ninth edition of Kerala Literature Festival returns to Kozhikode Beach with global speakers", "Label": 0, "Date": "2026-01-22", "SourceType": "real-dated", "NLP_Confidence": 35.4, "Matched_Localities": "Kozhikode Beach", "Matched_Localities_Fixed": "Kozhikode Beach", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Kozhikode positioned as adventure tourism hub as water festival features kayaking and paramotoring", "Label": 0, "Date": "2025-01-05", "SourceType": "real-dated", "NLP_Confidence": 37.6, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode infrastructure bottlenecks highlighted in 2025 economic review of Malabar region", "Label": 0, "Date": "2025-11-10", "SourceType": "real-dated", "NLP_Confidence": 38.3, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Flood of complaints against Kozhikode civic body over pothole-ridden roads", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 40.4, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode drainage tender approved for next fiscal year infrastructure upgrade", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 38.8, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Last year's flood: a retrospective on Kozhikode's recovery and rebuilding efforts", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 39.9, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode IT park sees flood of new job openings this quarter", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 38.7, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Traffic block near SM Street due to festival procession, not weather related", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 40.5, "Matched_Localities": "SM Street", "Matched_Localities_Fixed": "SM Street", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "New multi-level parking facility inaugurated at Kozhikode airport", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 37.5, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Rain expected to bring relief from summer heat, IMD says, no warning issued", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 42.6, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Kozhikode Corporation wins state award for best urban sanitation practices", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 36.4, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Mild showers likely over Kozhikode this weekend, weather department confirms no alert", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 39.5, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode beach cleanup drive removes tonnes of plastic waste ahead of tourist season", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 37.9, "Matched_Localities": "Kozhikode Beach", "Matched_Localities_Fixed": "Kozhikode Beach", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Local body elections: Kozhikode ward results announced amid high voter turnout", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 39.9, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Restaurant review roundup: best seafood spots near Kozhikode beach promenade", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 38.9, "Matched_Localities": "Kozhikode Beach", "Matched_Localities_Fixed": "Kozhikode Beach", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Kozhikode Medical College launches new cardiology wing for patient care", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 39.3, "Matched_Localities": "Medical College", "Matched_Localities_Fixed": "Medical College", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Kerala government sanctions funds for road widening project in Kozhikode", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 40.6, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Weather stays pleasant across Kozhikode district through the coming week, IMD confirms", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 41.8, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode football club wins state league title after dramatic final", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 37.5, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Rain drenches Kozhikode's cultural festival grounds but crowd spirit stays cheerful", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 37.6, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "New drainage design study submitted for future flood-proofing research project", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 39.1, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": false, "Neighboring_Districts": ""}, {"Title": "Kozhikode's monsoon-season tourism sees rise in domestic visitor numbers", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 40.6, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode street food festival draws record crowds over the weekend", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 37.0, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Local college hosts hackathon on smart city solutions for Kozhikode", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 39.2, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode Corporation launches digital grievance redressal portal for residents", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 39.8, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Malabar handloom exhibition inaugurated at Kozhikode town hall", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 38.1, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "Kozhikode-based startup wins state innovation award for water-purification device", "Label": 0, "Date": "", "SourceType": "synthetic", "NLP_Confidence": 37.7, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}, {"Title": "IMD issues red alert for Kozhikode among eight Kerala districts as monsoon rains trigger landslides", "Label": 1, "Date": "2026-08-01", "SourceType": "real-dated", "NLP_Confidence": 63.5, "Matched_Localities": "", "Matched_Localities_Fixed": "", "City_Level_Alert": true, "Neighboring_Districts": ""}];
+const LOCALITIES = {"Palayam": [11.2536, 75.7794], "Mavoor Road": [11.2612, 75.7967], "Kallai": [11.2465, 75.7739], "Nadakkavu": [11.2632, 75.785], "Puthiyara": [11.2523, 75.786], "Eranhipalam": [11.2745, 75.787], "Chevayur": [11.2802, 75.7778], "West Hill": [11.289, 75.762], "Beypore": [11.1774, 75.8069], "Medical College": [11.2977, 75.7803], "Mini Bypass": [11.2661, 75.7909], "SM Street": [11.2508, 75.7773], "Kozhikode Beach": [11.2545, 75.771], "Railway Station": [11.2483, 75.7796], "KSRTC": [11.25, 75.785], "Arayidathupalam": [11.265, 75.7825], "Kottooli": [11.24, 75.775], "Vellayil": [11.265, 75.774], "Ashokapuram": [11.258, 75.787]};
+const BOUNDARY = {"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"name": "Kozhikode Municipal Corporation boundary (dissolved)"}, "geometry": {"type": "Polygon", "coordinates": [[[75.74696289931842, 11.33615000062207], [75.74660829933362, 11.336947700176268], [75.7463905995466, 11.33883369991537], [75.74576829926764, 11.342250000437218], [75.74511459915948, 11.34545460054943], [75.74493419965364, 11.349366400538997], [75.7440325996248, 11.350825000173643], [75.74238709928528, 11.353698000462373], [75.74122669955261, 11.354562499859526], [75.7403468999895, 11.355614399984631], [75.73963879989077, 11.356014100070695], [75.73845859978462, 11.356413800156815], [75.73771829946003, 11.356634700630991], [75.73651669998577, 11.356939800131727], [75.7353150996122, 11.35698180026992], [75.73461769964717, 11.356519000151764], [75.73417779986562, 11.355908900075747], [75.73407519981066, 11.355344300299294], [75.73403829972779, 11.355141000456854], [75.73401689946041, 11.354236400289665], [75.73402759959413, 11.353363400500598], [75.7341670997319, 11.352658600014422], [75.73366679968314, 11.352034000168999], [75.73428149979145, 11.351478200258782], [75.73452679977203, 11.351166000610476], [75.73504809988998, 11.350614000335895], [75.73499719916146, 11.350385100392145], [75.73494899999639, 11.350143199848844], [75.73497029953973, 11.349898600440099], [75.73488989924948, 11.349638400491813], [75.73489099912035, 11.349431600488003], [75.73489259991362, 11.349254399870688], [75.73493009984429, 11.348809999881666], [75.73498379926298, 11.348549600283889], [75.73503209915214, 11.348291900450874], [75.73501059995925, 11.348078900520875], [75.73503079963177, 11.347923700018782], [75.735093699115, 11.347666000185825], [75.73516889952515, 11.347329400131741], [75.73519839998625, 11.34693749986576], [75.73523589991692, 11.346616700000766], [75.73528689957084, 11.346330100453827], [75.73528289938633, 11.346047400367297], [75.73534419987499, 11.345631900092144], [75.73534729983805, 11.345610800198301], [75.73565299918664, 11.344853400164311], [75.73569599937093, 11.344553600368386], [75.73558819943594, 11.344475200170393], [75.73552969943614, 11.344432700009122], [75.73545459975003, 11.344301200240238], [75.73547599911814, 11.34414870040223], [75.73561199999386, 11.343692000385545], [75.73578179919076, 11.343275599889068], [75.73595879925921, 11.342902100651486], [75.73611969966447, 11.342481300671523], [75.73624599955332, 11.342112000368559], [75.73639329951123, 11.341781799890214], [75.73658399985175, 11.341363000002502], [75.73667759949166, 11.340982299893255], [75.73675809960667, 11.340693100406327], [75.73675299955136, 11.340117000099497], [75.7367151992471, 11.33979370011923], [75.73666899927497, 11.339288000540819], [75.73654099966745, 11.338874000334897], [75.73643619987081, 11.33855240007324], [75.73628399950701, 11.338046999969094], [75.73624199936881, 11.337632000616395], [75.73621629944273, 11.337416300022255], [75.73599639991397, 11.33724270029046], [75.73571199920946, 11.337216400516525], [75.7354920996807, 11.337048100489483], [75.7352131992298, 11.336790400656525], [75.73471959913024, 11.336648300578645], [75.73440849935281, 11.336459000482535], [75.73427969934869, 11.336048700087474], [75.73425829998064, 11.335549100610535], [75.73404369925737, 11.335138800215532], [75.73392569921168, 11.335123000026499], [75.73386669918887, 11.335038899925337], [75.73385059952562, 11.334938900709744], [75.7338880994563, 11.33481270064567], [75.73409199914653, 11.334570700277652], [75.73422069932587, 11.334244600707791], [75.73436559989256, 11.333986899975514], [75.73440849935281, 11.33377649998556], [75.7345636998549, 11.333714999847416], [75.73463379931047, 11.333697600663811], [75.73482159933741, 11.333513500447737], [75.73498779944742, 11.333245300130557], [75.73525069916047, 11.332892899887497], [75.73547599911814, 11.332429999944566], [75.73577639966118, 11.332035500637915], [75.73606729976615, 11.331317499902752], [75.73622169987163, 11.33101510016678], [75.73636109928538, 11.330625900564883], [75.73641629967256, 11.330419700408868], [75.73644699982924, 11.330304999975795], [75.7364898992895, 11.329857900221953], [75.73643089926662, 11.329726400453069], [75.73627529946555, 11.329621200458064], [75.73618279969651, 11.329460800075935], [75.73621359967797, 11.329436500394252], [75.73626389965932, 11.329439100334241], [75.73632899978355, 11.329463400015925], [75.73647109986143, 11.329587000140009], [75.73651939975053, 11.329589699904773], [75.7366159995288, 11.32951870022788], [75.73676879974039, 11.329326700367005], [75.73705319954558, 11.328769100014028], [75.7370833996792, 11.32861040024983], [75.73718049948053, 11.32828980003427], [75.73725159988146, 11.32785920014203], [75.73718729925451, 11.32734370065134], [75.73706899973462, 11.32703530063867], [75.73720869952194, 11.32679930054735], [75.7372891996369, 11.326644100045257], [75.7373669999871, 11.326525800525303], [75.73741789981631, 11.326207499876261], [75.73740179925369, 11.325792000500485], [75.7374071996826, 11.325292300299452], [75.73739649954888, 11.32492409986736], [75.73726239983995, 11.324713699877407], [75.73731599943386, 11.324587500712653], [75.73742869977474, 11.324508600491583], [75.73754129939152, 11.324592700592689], [75.73771829946003, 11.324598000297499], [75.73787929969001, 11.324534900265462], [75.73801869910375, 11.324282400312597], [75.73799729973564, 11.324024700479583], [75.73803479966631, 11.323908900175638], [75.73810989935242, 11.323840600263566], [75.73828159971612, 11.32380370018069], [75.7384371995172, 11.323851099848412], [75.73873219963139, 11.323793200595787], [75.73932229968443, 11.323619599964616], [75.73963339946187, 11.323372400615824], [75.73980509982556, 11.323225100657908], [75.73991239973753, 11.323172500210774], [75.7399981995573, 11.323035800561797], [75.73990699930863, 11.32291480037776], [75.73985339971466, 11.322820099967714], [75.73993379910559, 11.322735999866552], [75.74005719958018, 11.322667600129705], [75.74020209924754, 11.322583400203825], [75.74030399962993, 11.322409800471974], [75.74029859920103, 11.3222836004079], [75.74018999976875, 11.322206000606513], [75.74009339999049, 11.322207300126877], [75.74008539962153, 11.322167899928672], [75.7401389992155, 11.322116599901221], [75.74021949933046, 11.322099500191825], [75.74030399962993, 11.32215210063896], [75.74038179998013, 11.32215210063896], [75.74064189920432, 11.32195749993872], [75.74116299967278, 11.321847000238904], [75.74144449916434, 11.32179440069109], [75.74164509924202, 11.321531400253946], [75.7417416999196, 11.321273700420988], [75.7419078991303, 11.321094800085007], [75.74195959935611, 11.32106919998364], [75.74203129960483, 11.32086859990602], [75.74206889936028, 11.320568800110095], [75.74220839949811, 11.320568800110095], [75.74250509933091, 11.320568000612809], [75.74288629946318, 11.320715199846632], [75.743291999826, 11.320784500704178], [75.74378009967194, 11.320821300063017], [75.74429129950391, 11.320935200099427], [75.74448359973837, 11.321043800431084], [75.74458879973338, 11.320919600459263], [75.74474009987574, 11.320740900672092], [75.74488009913733, 11.320537900303918], [75.74526609985071, 11.320379500013985], [75.7458239996779, 11.320174299904068], [75.74602779954336, 11.320142800250096], [75.7461001994647, 11.320090200702225], [75.74613239969057, 11.320024400006105], [75.74676009949906, 11.31776260056364], [75.74685929921736, 11.317628400130616], [75.74699069916147, 11.317612700665677], [75.74704169971471, 11.31747330035256], [75.74703369934582, 11.317084000026625], [75.74695589989494, 11.31689990070987], [75.74685229979383, 11.316841100336546], [75.74684849925887, 11.316808200438174], [75.74686249990452, 11.316723799963427], [75.74711679940083, 11.316444900411852], [75.74722949974165, 11.316118799942728], [75.7474010993813, 11.315445500009844], [75.7475673993161, 11.314919500034932], [75.74881189914987, 11.311652900660874], [75.74925219912973, 11.310573699816416], [75.74988479934404, 11.309022800062223], [75.75072239911947, 11.307083500203419], [75.7509267997321, 11.306619500389672], [75.75143009991922, 11.304993800423574], [75.75193019941923, 11.303717399838206], [75.75250909931555, 11.302651800340357], [75.75386919980377, 11.29914940052447], [75.75429399996818, 11.29762400014755], [75.75468799925181, 11.296696000520058], [75.7549789991815, 11.296011000407418], [75.75526499977997, 11.295225000133712], [75.75585699920123, 11.293867000461773], [75.75621499952268, 11.293007000372825], [75.75649899912958, 11.292204000214497], [75.75671899938237, 11.291572999894072], [75.75681499931284, 11.291242999964538], [75.75698299986561, 11.290933000057976], [75.7570959996807, 11.290523000036444], [75.7573559999795, 11.289780999993184], [75.75756599977115, 11.289101000111089], [75.75777899970115, 11.28868000048169], [75.75805099965396, 11.28799000013845], [75.75818299944592, 11.287525000278606], [75.75848799912194, 11.286751000558297], [75.75871999992813, 11.285979000030864], [75.7589819994198, 11.285209000495001], [75.7592079999493, 11.28458200035908], [75.75932499994883, 11.284147000084033], [75.75952799941768, 11.283723000316286], [75.7596209992098, 11.283238000433414], [75.7597979992783, 11.282999000203745], [75.76009509930947, 11.282060300442538], [75.76015499955366, 11.281871000346428], [75.76036699943751, 11.281403000348234], [75.76069669989283, 11.28070710045239], [75.76091219993816, 11.280147100708177], [75.76148649980217, 11.278514699893549], [75.76194869917316, 11.277099100443195], [75.7626207994104, 11.275143700021772], [75.76278129961736, 11.27469310010656], [75.76329969942162, 11.273236899863093], [75.76369559987211, 11.272280399820659], [75.76408329940477, 11.271168400701185], [75.76431479928863, 11.270504200108803], [75.76442169990156, 11.26947640001589], [75.76434819921008, 11.268148800127051], [75.76430249926096, 11.267525600526085], [75.7640638992296, 11.267422799922315], [75.76171709946465, 11.266180800203813], [75.7615567998065, 11.266074300688501], [75.76148469935947, 11.266005100554992], [75.76142899984853, 11.26592510046305], [75.76130539972445, 11.265692700357874], [75.76116709928226, 11.265497300160348], [75.76116269979883, 11.265466900377191], [75.76119639919455, 11.265364499971724], [75.7612490994664, 11.265338100373071], [75.76131209967372, 11.265352900516007], [75.76136269912934, 11.265351000248529], [75.7613960999501, 11.265368599980945], [75.76141049989474, 11.26539700057117], [75.76146629923039, 11.265616400076851], [75.76157839972342, 11.265846600440284], [75.76164769968165, 11.26592990014484], [75.76171359930322, 11.265978200033942], [75.76179849980099, 11.26602120021829], [75.76366849970157, 11.267033000472622], [75.7636862999828, 11.266999800200665], [75.7645527994722, 11.267447800175887], [75.76453249997496, 11.267485600480143], [75.76493739994112, 11.267684400115002], [75.76498309989023, 11.267623900023011], [75.76513099969594, 11.267580299990925], [75.76526929923881, 11.267548800336897], [75.76544249967168, 11.266935400648265], [75.76551469994348, 11.266954799924122], [75.76610609951695, 11.265523400284735], [75.76620119922603, 11.264797200430507], [75.76613689949835, 11.264773200223033], [75.76643819936345, 11.263903400221807], [75.76616859970119, 11.263427399854663], [75.7661921997103, 11.263413800306694], [75.76617259988564, 11.263368899854868], [75.76614729925853, 11.26321930033049], [75.76609009967842, 11.263095600381689], [75.76606589982146, 11.26297180060817], [75.76604179978926, 11.262873699861416], [75.76597049973884, 11.262760799871046], [75.76572589943078, 11.262624299871618], [75.76535509995796, 11.262481500121169], [75.76470599988204, 11.262395500651905], [75.76397129963584, 11.262374600407554], [75.76388659968688, 11.262382700601222], [75.76378399963193, 11.262421500052255], [75.76306539994829, 11.262687500627692], [75.76294709952907, 11.262745800078676], [75.76228629927334, 11.263272399901382], [75.76214069993341, 11.263427200205172], [75.7617263993539, 11.264111200271714], [75.7616446995433, 11.264280900543156], [75.7616446995433, 11.26432150043695], [75.76163169984312, 11.264360100238491], [75.76160699996313, 11.264392800487428], [75.76157319984338, 11.264416199947732], [75.76153349927165, 11.264428100676355], [75.76149309992667, 11.264427300279749], [75.76145489942411, 11.264414500229066], [75.76142249954876, 11.264390900219894], [75.76139899936436, 11.264358699994034], [75.76138669933675, 11.264321000413872], [75.76133189914788, 11.264320799865061], [75.76019149943818, 11.264838400172096], [75.7599766999648, 11.264941199876546], [75.75901549916603, 11.265662800597795], [75.75863289968862, 11.266080000591614], [75.75859549958267, 11.266106700563853], [75.75855149935228, 11.266120600485351], [75.75850529938015, 11.266120500660634], [75.75846149969851, 11.266106300365493], [75.75842419941733, 11.266079500568537], [75.75839889968955, 11.266045600624011], [75.7583845995697, 11.26600610060109], [75.75838249965267, 11.265964100462895], [75.75839279958808, 11.265923399845065], [75.75841459915449, 11.265887300158852], [75.7585569996059, 11.26576090044523], [75.75889289998742, 11.265543400307706], [75.75987719987296, 11.264789500435143], [75.76011479985817, 11.264668000228085], [75.76144889914741, 11.264090600400948], [75.76153379964518, 11.264047900590185], [75.76158399980181, 11.26400750034594], [75.76201569956493, 11.263311399901227], [75.76218569931063, 11.263132400639847], [75.76287809994443, 11.262586000443605], [75.76298389978723, 11.262527299894998], [75.76371439930017, 11.262221399997657], [75.76382629924439, 11.262195400597307], [75.7639746999725, 11.262180899928637], [75.76470989934245, 11.262223800288211], [75.76543779981466, 11.262326800541473], [75.76599499996934, 11.262564600176233], [75.76686639986451, 11.261362700328391], [75.76785239946872, 11.2593687999302], [75.76827199975304, 11.258522000090295], [75.76853799942921, 11.257674000554744], [75.76883189967248, 11.256987299824061], [75.76887399963545, 11.256889000327135], [75.76911599910414, 11.256332999868107], [75.76911599910414, 11.256319000121835], [75.76935899951826, 11.255706000631449], [75.76955099937919, 11.255316000632945], [75.76970299919412, 11.2550930002418], [75.76988799963152, 11.254578999920966], [75.77007889962158, 11.253992900052367], [75.77013199919247, 11.25386800040792], [75.77057499983641, 11.252480000251865], [75.77098999918917, 11.251396000624993], [75.77125799985686, 11.250548000190122], [75.77156699971732, 11.24986700026193], [75.77159799934827, 11.249740000700513], [75.77164299962482, 11.24958300065498], [75.77167799944016, 11.249504000609193], [75.77176699994715, 11.249460000378747], [75.7717919993014, 11.249390999894786], [75.77169899950928, 11.249376000102359], [75.77163999948647, 11.249346000517562], [75.77166999997058, 11.249287000494746], [75.77141799914142, 11.249192000610378], [75.77144299939494, 11.249123000126417], [75.77169999955538, 11.249197999987757], [75.77180899918602, 11.249154000656631], [75.77178399983177, 11.249105000195641], [75.77177999964732, 11.249095000633815], [75.7718999997852, 11.248829000058379], [75.77203099953107, 11.248512999875118], [75.77213799996878, 11.248269000314167], [75.77226099934569, 11.24799800040745], [75.77234399957598, 11.247776000062402], [75.7724369993681, 11.247516000662927], [75.77247899950629, 11.247294000317936], [75.77258799913693, 11.24711200001883], [75.77263899969012, 11.246900000134929], [75.77264599911365, 11.2467070002279], [75.77263099932122, 11.246605000020793], [75.77255599945988, 11.246595000458967], [75.77249999957536, 11.246566000020948], [75.77248999911421, 11.24649700043625], [75.77255499941373, 11.246477000413279], [75.7726159995288, 11.246501000620754], [75.77268099982831, 11.246462000620909], [75.77273099943613, 11.24633300006792], [75.7727849992284, 11.246155999999473], [75.7728349997355, 11.246003000138387], [75.77284499929732, 11.245865000069728], [75.77286999955089, 11.245767000047067], [75.77291899911256, 11.245713000254796], [75.77286999955089, 11.24565400023198], [75.77290999959683, 11.24554500060134], [75.77286999955089, 11.245506000601495], [75.77278999945895, 11.245515000117223], [75.77273499962058, 11.245481000347922], [75.77276499920538, 11.245406000486582], [75.77286999955089, 11.245417000094506], [75.77292999961986, 11.245431999886932], [75.7729989992045, 11.245285000302545], [75.77298899964268, 11.245206000256758], [75.7729989992045, 11.245048000165127], [75.77305399994219, 11.244959000557458], [75.77306899973462, 11.244856000304196], [75.77309499913497, 11.244731999981866], [75.77312499961909, 11.244628000581827], [75.77315499920388, 11.244539000074838], [75.77313499918091, 11.244458999982896], [75.77308099938864, 11.244455999844547], [75.77305099980384, 11.24442100002915], [75.77306099936567, 11.24437700069808], [75.77313499918091, 11.244372000467479], [75.77317999945745, 11.244377999844858], [75.77318499968806, 11.244249000191246], [75.77321099998773, 11.24411500030709], [75.77324199961862, 11.243986000653479], [75.77327699943402, 11.24390200037709], [75.77331299929551, 11.243802000262178], [75.77336299980266, 11.243717999985734], [75.77341299941043, 11.243688000400937], [75.77334299977969, 11.243617999870821], [75.77328299971072, 11.243603000078451], [75.7732179994112, 11.243498000632258], [75.7732179994112, 11.243453000355714], [75.77322799987235, 11.243409000125325], [75.77322799987235, 11.243354000286956], [75.7732229996418, 11.24330499982591], [75.77324899994147, 11.243260000448686], [75.77327899952627, 11.243220000402744], [75.77330499982594, 11.243176000172298], [75.77333999964134, 11.243130999895754], [75.77334999920316, 11.243081000287987], [75.7733549994337, 11.243031000680162], [75.77338499991788, 11.242992000680317], [75.77340499994085, 11.24294200017323], [75.77342499996382, 11.24289300061156], [75.77345399950252, 11.242849000381113], [75.7734789997561, 11.242809000335171], [75.7734839999867, 11.2427550005429], [75.77348299994054, 11.242705000035755], [75.77348299994054, 11.24265100024354], [75.7734729994794, 11.242601000635716], [75.77346799924885, 11.242556000359173], [75.7734729994794, 11.242497000336357], [75.77347799971, 11.242443000544085], [75.7734729994794, 11.242393000036998], [75.77346799924885, 11.24234400047527], [75.7734669992027, 11.24229500001428], [75.77348599917957, 11.24224600045261], [75.77352099989429, 11.242208000498863], [75.77354499920239, 11.242164000268474], [75.7735739996404, 11.242126000314727], [75.7736079994097, 11.24209300059158], [75.77363699984772, 11.242050000407232], [75.773650999594, 11.242000999946242], [75.7736559998246, 11.24197600059199], [75.77367599984757, 11.24187200029263], [75.7736859994094, 11.24181800050036], [75.77369599987054, 11.24177400026997], [75.77371499984741, 11.241719000431601], [75.77371599989351, 11.241666000685427], [75.77371599989351, 11.241611999993836], [75.77372099922479, 11.241558000201621], [75.77374099924776, 11.241518000155622], [75.77376599950134, 11.241473999925233], [75.77376099927073, 11.241425000363506], [75.77374699952446, 11.241375999902516], [75.77372799954759, 11.241327000340846], [75.77370899957072, 11.241284000156554], [75.77370899957072, 11.241230000364283], [75.77373499987038, 11.24118500008774], [75.77376499945524, 11.241140999857294], [75.77375599993951, 11.241097000526224], [75.77386499957015, 11.241057000480225], [75.7739049996161, 11.241017000434283], [75.77394499966204, 11.240997000411312], [75.77398399966194, 11.240957000365313], [75.77400799986935, 11.240907999904323], [75.77402299966178, 11.240859000342653], [75.7740469998692, 11.240804000504284], [75.77406599984607, 11.240755000043293], [75.77408499982295, 11.240706000481566], [75.77408999915417, 11.240657000020576], [75.77408899910807, 11.240603000228305], [75.77409899956922, 11.240548000389936], [75.7741229997767, 11.240504000159547], [75.77412799910792, 11.240455000597876], [75.77411799954609, 11.24040600013683], [75.77409799952312, 11.240357000575159], [75.77407399931565, 11.240312000298616], [75.7740389995003, 11.240273000298771], [75.77399999950046, 11.240233000252829], [75.77397099996176, 11.240199000483528], [75.77396099950056, 11.24014899997644], [75.774004999731, 11.240125000668286], [75.77405499933883, 11.240135000230111], [75.77409899956922, 11.240106000691412], [75.77414799913089, 11.240086000668441], [75.77418699913073, 11.240057000230422], [75.77420699915376, 11.240012999999976], [75.77422699917673, 11.239964000438306], [75.7742469991997, 11.239920000207917], [75.7742519994303, 11.239914999977316], [75.77427699968382, 11.2398220001852], [75.7743239991533, 11.239626000139822], [75.77436399919924, 11.239411000117627], [75.77438699936062, 11.239267999818367], [75.7743239991533, 11.239219000256696], [75.77425099938415, 11.239145000441454], [75.7742459991536, 11.239091000649182], [75.7743249991994, 11.239091000649182], [75.77439899991396, 11.239021000119124], [75.77445199966013, 11.238976999888678], [75.77451099968295, 11.238828000212095], [75.77452999965982, 11.238704999935862], [75.77454399940609, 11.238605999867048], [75.77461699917524, 11.23849300005196], [75.7746799993825, 11.238445000536387], [75.77472299956685, 11.238386000513572], [75.77476199956669, 11.23824900049101], [75.77475699933609, 11.23819400065264], [75.77473799935922, 11.23814500019165], [75.7746799993825, 11.238115000606854], [75.77462599959028, 11.23811899989198], [75.77457299984411, 11.23809899986901], [75.77455799915242, 11.238034000468815], [75.77460199938281, 11.238000000699515], [75.77467599919805, 11.238006000076894], [75.77475799938225, 11.238021999915418], [75.7748219996356, 11.238012000353592], [75.77488799998127, 11.23790399986973], [75.7749029997737, 11.237766000700447], [75.77498799919687, 11.237554999963322], [75.77506799928881, 11.237392000540467], [75.77513399963442, 11.237234000448836], [75.77513899986502, 11.237215000471963], [75.77523799993378, 11.237033000172858], [75.77534299937997, 11.236811999873964], [75.77539799921834, 11.236669000474024], [75.77541299991009, 11.236638999989907], [75.77552199954073, 11.236433000382704], [75.77563699944801, 11.236305999922024], [75.77565699947098, 11.236216000268257], [75.77567699949401, 11.236098000222569], [75.77574699912475, 11.236033999969152], [75.77575199935535, 11.23596000015391], [75.77564299972471, 11.23594500036154], [75.77557399924075, 11.235891000569268], [75.77556399967892, 11.235836999877677], [75.77564900000141, 11.235832000546452], [75.77577299942442, 11.235866000315696], [75.77590399917028, 11.235565999970959], [75.77597099956205, 11.235308000663736], [75.77601199965414, 11.235170000595076], [75.77608699951548, 11.235105000295562], [75.77615799919238, 11.235026000249775], [75.77614899967665, 11.234966000180805], [75.77608899960768, 11.234951000388378], [75.77603499981547, 11.234886000088864], [75.77604499937729, 11.234832000296649], [75.77614399944605, 11.234841999858475], [75.77621399997616, 11.234724000712106], [75.77626799976844, 11.234636000251271], [75.77631299914566, 11.234536000136359], [75.77638799990632, 11.234353000690476], [75.77648399983678, 11.234179999907099], [75.77656299988257, 11.23408099983834], [75.77660299992857, 11.233993000276769], [75.77652799916791, 11.233963000691972], [75.77642899999842, 11.233963000691972], [75.77645399935267, 11.233864000623157], [75.77653799962906, 11.233829999954594], [75.77660299992857, 11.233864000623157], [75.77665699972084, 11.23386000043871], [75.77675899992795, 11.233690000693002], [75.77680499935127, 11.23359800004772], [75.77685199972007, 11.233507000347856], [75.77688899962772, 11.233416000647935], [75.77692599953531, 11.233325000048751], [75.7769629994429, 11.233234000348887], [75.77701799928133, 11.23315200016475], [75.77708299958084, 11.233079000395605], [75.77702699969632, 11.233016000188286], [75.77693499995036, 11.232998000257567], [75.77698999978873, 11.23293400000415], [75.77708299958084, 11.2328970000965], [75.77712899990348, 11.232814999912364], [75.77718499978795, 11.232742000143219], [75.7772219996956, 11.232651000443354], [75.77726799911892, 11.232569000259218], [75.77731499948771, 11.232496000490073], [75.77735199939531, 11.232403999844792], [75.77739799971795, 11.23231300014487], [75.7774349996256, 11.232230999960734], [75.77746199997137, 11.23214000026087], [75.77746199997137, 11.232040000145957], [75.77737899974107, 11.232013000699453], [75.77728599994902, 11.231986000353686], [75.77731399944156, 11.231913000584541], [75.77740699923368, 11.231894000607667], [75.77749899987901, 11.231866000215803], [75.77755499976348, 11.23178400003161], [75.77757299969426, 11.231693000331745], [75.77760999960185, 11.23160200063188], [75.77765599992449, 11.231520000447688], [75.77772099932474, 11.2314470006786], [75.77775799923234, 11.231356000079415], [75.77780399955498, 11.231273999895222], [75.77785099992377, 11.231173000633532], [75.77787899941637, 11.231082000034348], [75.777832999993, 11.230999999850155], [75.77776899973958, 11.230917000519185], [75.77785099992377, 11.230900000634563], [75.77793399925474, 11.230854000311922], [75.77807099927725, 11.230764000658155], [75.77810699913874, 11.230673000058971], [75.77815499955364, 11.230581000312952], [75.77816499911546, 11.230490000613088], [75.7782039991153, 11.23039799996775], [75.7782509994841, 11.230315000636836], [75.77828999948395, 11.2302219999454], [75.77835499978346, 11.230149000176255], [75.77839199969111, 11.230057000430293], [75.77844699952948, 11.229985000707245], [75.77849299985212, 11.229903000523109], [75.77852099934472, 11.229821000338916], [75.77855799925231, 11.229720000177906], [75.77859399911381, 11.22963000052414], [75.77863099992078, 11.229538999924955], [75.778675999298, 11.229449000271188], [75.7787119991595, 11.229358000571324], [75.77873999955142, 11.22926699997214], [75.77876699989719, 11.229177000318373], [75.77878499982796, 11.22907700020346], [75.77882099968946, 11.229005000480413], [75.7789029998736, 11.228831000550258], [75.77894899929692, 11.228739999951074], [75.77896799927379, 11.22864900025121], [75.77898599920456, 11.228558000551345], [75.77899599966571, 11.228466999952161], [75.77900599922754, 11.228366999837249], [75.77895369915393, 11.228295000114201], [75.7789078993801, 11.228200699902402], [75.77879869920065, 11.228162900497523], [75.77868619940864, 11.227813000369736], [75.77803379972016, 11.227337000002592], [75.77798879944362, 11.22727400069465], [75.77798559965578, 11.227217300238237], [75.77805949964625, 11.22718890054739], [75.77831529921173, 11.227369399877944], [75.77937719979798, 11.22811880044236], [75.77968679950624, 11.227770000185387], [75.77985279996682, 11.22758289983102], [75.77974999936305, 11.227396900246788], [75.7796117996449, 11.226735000120186], [75.77851269950156, 11.225953200579795], [75.77847409970002, 11.225909000699858], [75.77847729948786, 11.225852300243503], [75.77856089956595, 11.225805000400499], [75.77878769959273, 11.225945600409204], [75.77919109948971, 11.225309200559195], [75.77958809981101, 11.224563100506714], [75.7807059993824, 11.221728000347014], [75.7818352996594, 11.21824790012056], [75.7832085994973, 11.215080200091222], [75.7845442995798, 11.21163360051031], [75.78540799947967, 11.209534000094095], [75.785774399469, 11.208379700462842], [75.78598899929295, 11.20820700005305], [75.78613759967055, 11.208060600316514], [75.78618049913081, 11.207915900298588], [75.78627169937948, 11.20770810024868], [75.78637899929146, 11.207437100341963], [75.78648399963691, 11.207149999872627], [75.78659399931365, 11.206906000311733], [75.78668469953931, 11.206634600206655], [75.78679199945128, 11.206355700655138], [75.78686899940487, 11.20609300059158], [75.78697439994863, 11.205795300712623], [75.78705759982842, 11.205513800321683], [75.78708899965767, 11.20527999997205], [75.78705219939951, 11.205079600443241], [75.78717289920996, 11.204753400149343], [75.78728819949089, 11.204495500666894], [75.78736299970274, 11.204249000091352], [75.78747299937947, 11.203978000184634], [75.78759939999236, 11.203703599941207], [75.78769299963227, 11.203436000371141], [75.78776839969197, 11.203182600196897], [75.78785799914738, 11.202922000050307], [75.78796699967734, 11.202652000189687], [75.78807699935408, 11.202352999891104], [75.78816529928918, 11.20205390066701], [75.78824039987461, 11.201803899930098], [75.78833699965287, 11.201572400046302], [75.78843619937118, 11.201288199890541], [75.788548899712, 11.201017199983824], [75.78866689975769, 11.200751500681235], [75.78876609947599, 11.20050409988437], [75.7888626992542, 11.20026210041567], [75.78898069929988, 11.199991100508953], [75.78910679953924, 11.199735899891891], [75.78920869992163, 11.199480600349489], [75.78932399930318, 11.19920960044277], [75.78942599951034, 11.198962300369942], [75.78954929926078, 11.198593900288301], [75.78975049918625, 11.19804930053482], [75.78986049976231, 11.197780900568148], [75.78996509990947, 11.197546700020212], [75.79008499932331, 11.197251000233507], [75.79019599994552, 11.19698000032679], [75.79030039954387, 11.196699499982003], [75.79041299916065, 11.196420600430429], [75.79052299973671, 11.196131200394632], [75.79061419998538, 11.195894399906706], [75.79072149989736, 11.195631300544107], [75.79082879980933, 11.195370800222292], [75.79096819922307, 11.195094500610764], [75.79105409976694, 11.194902400025796], [75.79119619984482, 11.194581400511254], [75.79130619952156, 11.194268300641625], [75.79140279929982, 11.194005200379763], [75.79152609994964, 11.193760500246924], [75.79162599934045, 11.193509000340157], [75.79172999963981, 11.19324740014747], [75.7918479996855, 11.192963299816483], [75.79197139926072, 11.192700100629168], [75.79206789921426, 11.192442300072116], [75.79217789979032, 11.192208100423557], [75.79227979927339, 11.191952900705871], [75.79237909971573, 11.191671300490157], [75.79246759930032, 11.191384500394406], [75.79253459969209, 11.191158200390703], [75.79275999947447, 11.190537300356198], [75.79290479931711, 11.190234700071414], [75.79302009959798, 11.18997950035373], [75.79313549970362, 11.18972419991195], [75.7932266999523, 11.18944800012514], [75.79333129920013, 11.189187500702644], [75.79345729961472, 11.188876999873685], [75.79358609961884, 11.188577000428268], [75.79370679942929, 11.188277099908305], [75.7937818991154, 11.188090200102693], [75.7938891999267, 11.187811300551118], [75.79400179954348, 11.1875403006444], [75.79410369992587, 11.187285100027395], [75.79419489927523, 11.187022000664854], [75.79432899988348, 11.186711499835894], [75.79443629979545, 11.186437800164413], [75.79457039950438, 11.186132599939583], [75.79467769941635, 11.185880000161944], [75.79476889966503, 11.185640600633235], [75.79489499990439, 11.18539319983637], [75.79500499958112, 11.185140600058673], [75.79512029986199, 11.1848353998339], [75.79524369943721, 11.184538100153247], [75.79534829958442, 11.18425649993759], [75.7954394998331, 11.183996000515037], [75.79552799941769, 11.183740799898032], [75.7956325995649, 11.183480300475537], [75.79574789984576, 11.1831803001308], [75.79585249999292, 11.182935599998018], [75.795951799536, 11.182659300386433], [75.79606439915278, 11.182393600184525], [75.79617169996402, 11.182111999968868], [75.79623069998689, 11.181869900675451], [75.79637019922535, 11.18146470033571], [75.79650699959842, 11.181180500180005], [75.79662769940887, 11.180922700522274], [75.79670549975907, 11.180654300555602], [75.79678059944519, 11.180354300210809], [75.79689059912192, 11.18009639982904], [75.7970165995365, 11.179804399853197], [75.79715069924544, 11.179467600149678], [75.7972112991622, 11.179300800191811], [75.79737069949823, 11.178862400479431], [75.79747259988062, 11.178612400641839], [75.7975315999035, 11.178372900389093], [75.79763889981541, 11.178057200579417], [75.79776499915545, 11.177796700257545], [75.79786149910893, 11.17752560052611], [75.79795269935767, 11.177267799969059], [75.79801709980939, 11.177025700675586], [75.7980760998322, 11.17670730020177], [75.79810289962916, 11.176438900235098], [75.79810829915874, 11.176152100139348], [75.7981289997536, 11.175851700495627], [75.79823429957332, 11.17556530059818], [75.7983174994531, 11.175354799884133], [75.79841139946654, 11.17512849988043], [75.79851869937852, 11.174923199945795], [75.79862589946572, 11.174665400288063], [75.79877079913314, 11.174373300487503], [75.79888339964924, 11.174149600423789], [75.79901219965336, 11.173923300420029], [75.79915429973119, 11.173657600218121], [75.79922409971249, 11.173454900223533], [75.79933939999336, 11.173115500579911], [75.79945209943492, 11.172868200507082], [75.79955129915317, 11.172578700646568], [75.79976049944753, 11.172031400229002], [75.79985439946103, 11.171720900299363], [75.79992949914714, 11.171462999917537], [75.80000459973257, 11.171255100042856], [75.80008769978758, 11.170976200491282], [75.80019499969956, 11.170652500312713], [75.80027279915043, 11.170442000497985], [75.80035799912241, 11.170164000268471], [75.80045249988302, 11.16987100024653], [75.80051149990584, 11.169623700173645], [75.80059739955038, 11.169313100419288], [75.80066439994215, 11.16903679990844], [75.80074489915785, 11.168797400379788], [75.80082799921286, 11.168544800602092], [75.80091389975672, 11.168257900681624], [75.80096499923536, 11.167996000115352], [75.80103989927198, 11.167739600702077], [75.80114719918396, 11.167510600034234], [75.80124909956635, 11.167242200067506], [75.80137249914156, 11.166952800031765], [75.8013940999578, 11.166632900388095], [75.80143869913672, 11.166576800678854], [75.80151689968523, 11.166478500282608], [75.8017362991909, 11.16556650049364], [75.80202349948496, 11.163761100694273], [75.80195739931457, 11.162653400334193], [75.80189029999741, 11.162539000274705], [75.79621359937818, 11.158972299831817], [75.79618389926759, 11.158972299831817], [75.79615499955366, 11.158965400233058], [75.79612859995495, 11.158952100159354], [75.79610499994584, 11.158932000311609], [75.79608719966461, 11.158906700583827], [75.7960762998814, 11.15887790069462], [75.79607349939255, 11.158838700145964], [75.79608329930488, 11.158800700192216], [75.79610479939703, 11.158767600644296], [75.79612949927701, 11.158746600575228], [75.79615889991334, 11.158732500104861], [75.79619109923988, 11.158726400003388], [75.7962260999546, 11.158729100667529], [75.79625909967774, 11.158741200146324], [75.79628739954393, 11.15876180001709], [75.79630499927634, 11.158783200284518], [75.79631729930395, 11.158807800339787], [75.80239279978792, 11.162625899965349], [75.80301329962413, 11.161601900407447], [75.80756619932072, 11.16448890044245], [75.80901359969795, 11.165509500563076], [75.81059149979791, 11.167119599989576], [75.81211909991657, 11.170282800710709], [75.81627709920883, 11.178258300680056], [75.81785489948408, 11.180115800004216], [75.82123609946649, 11.181442600395712], [75.82551899930246, 11.181000400148378], [75.82777309964888, 11.181177300392164], [75.83142469969022, 11.18130990003192], [75.83345339935494, 11.182061800711608], [75.83503129945495, 11.183830900275893], [75.83539199954123, 11.185599900015404], [75.83556659931918, 11.186487699947463], [75.83588789920725, 11.18812080043466], [75.8356669996324, 11.189182700121535], [75.8349861993537, 11.19245480064859], [75.83406679994295, 11.199026000249773], [75.83403949922359, 11.199221199898489], [75.83552719912097, 11.202493700623847], [75.83637379931145, 11.20600400008459], [75.83775069913554, 11.208627800033014], [75.83785059942568, 11.209618200019975], [75.83801169948038, 11.21071680014029], [75.83659919999315, 11.210206100331334], [75.83543799986387, 11.209492700527733], [75.83470299924409, 11.20882710059027], [75.83281149925136, 11.207953200579766], [75.8302741996946, 11.208051500076692], [75.8275885992345, 11.20855890027309], [75.82625979965007, 11.208493500674592], [75.82483609910673, 11.209071799823732], [75.82448209986904, 11.209215600519599], [75.8221656998872, 11.209744400084048], [75.82160649964032, 11.212046100647058], [75.82128119956775, 11.212974500472853], [75.82231809990043, 11.214610700023854], [75.82317469965272, 11.215627799983054], [75.82353529991423, 11.216998600604995], [75.82362549921748, 11.218988600643456], [75.82357419918998, 11.219919700234016], [75.82353529991423, 11.2206248001944], [75.82367059931875, 11.222791600651874], [75.82276889946519, 11.224029700010703], [75.82132629966907, 11.224604600621888], [75.8187352997943, 11.22499580031598], [75.81758029959121, 11.223934299928032], [75.8163867994113, 11.221586599941702], [75.81447379932644, 11.218900100159544], [75.81158849990942, 11.217661999901395], [75.8096499995479, 11.217440900677047], [75.80825729953483, 11.21798250029218], [75.8093132996691, 11.219946800404557], [75.81022129927362, 11.22108390050164], [75.80999809923293, 11.2220843998752], [75.80916729923155, 11.222929100697513], [75.80827839942867, 11.224470200539372], [75.80699249930444, 11.225535700212447], [75.80603919994917, 11.226375899927916], [75.80554329938383, 11.227407899854768], [75.80537579975339, 11.229130499972655], [75.8067991999232, 11.23007570003358], [75.80860029916454, 11.229753200449863], [75.81002579925126, 11.228470900311834], [75.81086719956164, 11.227700000554648], [75.8114532994303, 11.227080900063527], [75.81384259935652, 11.226506000351662], [75.81681809987549, 11.228142199902663], [75.81938769948277, 11.22964560016436], [75.82173199913251, 11.231679700257985], [75.82231809990043, 11.239550600080179], [75.82206719984146, 11.241088599958971], [75.82141649987165, 11.245077700275715], [75.82405399919276, 11.245373200412928], [75.82554839993878, 11.246210999837842], [75.82695919970735, 11.246440299979895], [75.8287648998803, 11.24720010030444], [75.8300722991973, 11.247642300551774], [75.83110919952998, 11.248836100205892], [75.8319054997391, 11.249177800315294], [75.83265449920583, 11.250306499845124], [75.83263739949643, 11.25220760010069], [75.83382409990236, 11.253992999877084], [75.83556689969271, 11.254250300411059], [75.8384222993497, 11.254085899844426], [75.84053039925857, 11.253892100440112], [75.8412611991451, 11.25376080032072], [75.84379329972109, 11.2531292001525], [75.84560739956191, 11.252759200176968], [75.8472597995002, 11.252873799886004], [75.84856869978574, 11.253405899962388], [75.8499309991164, 11.254477000613122], [75.85058629911845, 11.257267100496335], [75.85028529962693, 11.260824200676382], [75.84925689968622, 11.262181399951714], [75.84895319953057, 11.262505000305566], [75.8479983992068, 11.263522100264765], [75.84781219997313, 11.26468719985445], [75.84751119958224, 11.26620640030518], [75.84638559911616, 11.26711949996502], [75.84608539912193, 11.267205300684111], [75.84442299962177, 11.267680600479366], [75.84301769920751, 11.268492900527008], [75.84264149930578, 11.269600300513503], [75.84249599979063, 11.270650400195848], [75.84325739910975, 11.27133530048377], [75.84431810000035, 11.272021600116773], [75.84524029989996, 11.272322600507664], [75.84663029924894, 11.272118300619127], [75.84769739971529, 11.271878400168077], [75.84907449918882, 11.27310980047696], [75.85058479994859, 11.27463519995456], [75.85186959930263, 11.275471800583205], [75.85392089982975, 11.274944699838102], [75.85653559953835, 11.275165700136995], [75.85809099950006, 11.275342600380725], [75.85966889960008, 11.275718400084145], [75.86037869941748, 11.276667799979009], [75.86063559975321, 11.27783250026971], [75.86100009947506, 11.279203399817106], [75.86025449944566, 11.28165700037033], [75.86031229977289, 11.283294300691466], [75.86310319915339, 11.286132300265479], [75.86433689992805, 11.287340800237814], [75.86264399992069, 11.288666499859119], [75.86243149911445, 11.288819600444242], [75.86132019966755, 11.289941000177066], [75.86062319990083, 11.290892100689916], [75.85993049979277, 11.292008600016914], [75.85817469940292, 11.292725700530696], [75.85809719942625, 11.295754199896464], [75.85619749941515, 11.298641500305052], [75.8555214997175, 11.298899299962784], [75.85529879969988, 11.299141300330803], [75.85406379940486, 11.300483100514725], [75.85304259943649, 11.29990090010648], [75.85193489997573, 11.298884100520866], [75.85112339942538, 11.299070000280324], [75.85072909976822, 11.300264600331104], [75.85019779918912, 11.301483700612323], [75.8497380999334, 11.302226400328152], [75.84908929933175, 11.303370600572805], [75.84855889987341, 11.304181400551215], [75.84804259998606, 11.304181700025481], [75.84757539948515, 11.3039723999064], [75.84589719979601, 11.30369939990743], [75.84421119938742, 11.303354800383772], [75.84298539915693, 11.302869500127372], [75.84210929940468, 11.304079099970522], [75.84180869921215, 11.304537899904233], [75.84143179963792, 11.305179200160012], [75.84084029934041, 11.305163899994056], [75.84020039932904, 11.30460380042507], [75.8392987993002, 11.303662700373366], [75.83907209999745, 11.303459300706209], [75.83832629941924, 11.302790000058508], [75.83771399960148, 11.301224900009174], [75.83575849935534, 11.29963150009371], [75.83375879922926, 11.298831400248957], [75.83167079916808, 11.298133800634446], [75.83007639920652, 11.297222600342764], [75.82979319999623, 11.29706069989146], [75.82901729910913, 11.29764519986611], [75.82854869926314, 11.298596800402038], [75.82830829968833, 11.299572099872535], [75.8264457992343, 11.299617300697946], [75.82593549962365, 11.300334900335429], [75.824797699854, 11.30193500020016], [75.82292579968595, 11.302601400534229], [75.82197139956048, 11.302943700491426], [75.82085609992913, 11.303016100412776], [75.82068759935328, 11.303027000195925], [75.81979549976256, 11.30264300047412], [75.8182314995841, 11.301872500015918], [75.81626539992834, 11.302418200539591], [75.81509529920874, 11.302569700331446], [75.81508519982219, 11.302891900440898], [75.81648189912039, 11.303592000170738], [75.81648459978453, 11.304789600359811], [75.81622859967018, 11.305865300143523], [75.81564589923892, 11.306996800162267], [75.81490209965222, 11.307748300643595], [75.81257269997019, 11.309445900507967], [75.8123999995604, 11.309571800198455], [75.80946969986684, 11.311837400175932], [75.80875959967585, 11.312909400148726], [75.80775649946293, 11.313826700541824], [75.80652799946768, 11.314534000243953], [75.8056469993096, 11.314793700169162], [75.80478839946511, 11.315046799969878], [75.80457819912465, 11.315108700306325], [75.80266219980075, 11.315440200305034], [75.80100539947966, 11.315838099948394], [75.799945999908, 11.316324400250892], [75.79931489976286, 11.316523300609902], [75.79875129913319, 11.316026000699424], [75.79831899952228, 11.315313500217883], [75.79822159934741, 11.315152900186263], [75.7980412996663, 11.313705100510049], [75.79761299934052, 11.312445300510262], [75.7968465997908, 11.311229600565639], [75.79515599934996, 11.310710199815901], [75.79320619990625, 11.31053330047149], [75.78971229958302, 11.310677000443263], [75.78757089957742, 11.311152200413744], [75.78722689990155, 11.311073400017449], [75.7850631994072, 11.310577500351428], [75.78461799992084, 11.310732300655218], [75.78403759995535, 11.310986400502031], [75.78338389984714, 11.312047399967582], [75.78280909996005, 11.312815500135287], [75.78217789999013, 11.313694100002749], [75.78184539994533, 11.314031200079853], [75.78179609911075, 11.31419800003772], [75.78168199942479, 11.314583700377511], [75.78163689932353, 11.315285499826018], [75.7816988994847, 11.31636860013083], [75.78196939936834, 11.316650399996036], [75.78242019983242, 11.316755400341492], [75.7829217994016, 11.316805100475051], [75.78338389984714, 11.316915600174866], [75.78389669957306, 11.31713660047376], [75.78393049969287, 11.317661600402573], [75.78381219927365, 11.317877100447902], [75.78359799964801, 11.31798760014766], [75.7831077998851, 11.318087100239552], [75.78274149972049, 11.318181000252991], [75.78251599921407, 11.318258400404886], [75.78214409987038, 11.318319100146425], [75.78193559924858, 11.318518100330095], [75.78180039966878, 11.318761200568986], [75.78180039966878, 11.318998800554255], [75.78209339969072, 11.319026399848497], [75.78239209961578, 11.318882800600818], [75.7827752998403, 11.318877200522422], [75.7829048993417, 11.319263999833765], [75.78298939964111, 11.319871900168096], [75.78310209998199, 11.320490700285632], [75.78280339915761, 11.321109600227942], [75.78245969985534, 11.321584800198423], [75.78222299919213, 11.32230870048619], [75.78219129988861, 11.322444700462597], [75.78205959957091, 11.323010400109922], [75.7816932994063, 11.32328670062077], [75.78141719944426, 11.323364099873345], [75.78070709925328, 11.323353000440648], [75.78041409923134, 11.32324249984157], [75.77997449982337, 11.32309879986974], [75.77958009944211, 11.323176200021635], [75.77932079971521, 11.323463500140463], [75.77903909967478, 11.323728800144067], [75.77864459946875, 11.324137600469953], [75.77843049966788, 11.324270299934426], [75.77779929969796, 11.32414869990265], [75.77703289924898, 11.323585100172295], [75.7765256996014, 11.323087800261817], [75.77588329947474, 11.322899900410107], [75.77552259938852, 11.323275700113527], [75.77525209950483, 11.324071300650076], [75.77484639914206, 11.325088000410915], [75.77403489949108, 11.325939000084816], [75.77255849957515, 11.326690500566201], [75.77185969936568, 11.32726509990448], [75.77157789950053, 11.327773500146975], [75.77188219950398, 11.328480700024329], [75.77235559993107, 11.329398000417427], [75.77234039958984, 11.330324400150971], [75.77233309979277, 11.330768300117029], [75.7721605999318, 11.331508899915832], [75.7718291997578, 11.33250830031784], [75.77155539936223, 11.333409400323603], [75.77036069948673, 11.334050400205854], [75.76876029924847, 11.33464710038345], [75.76754309923467, 11.334713400203327], [75.7661454997151, 11.334625000443452], [75.76477049925921, 11.335199700505825], [75.76404919981076, 11.33615000062207], [75.76355329924542, 11.33763080002143], [75.76357579938372, 11.338625399842385], [75.76380119916604, 11.339863000077457], [75.7633954997026, 11.34070290031866], [75.76251639981206, 11.341476400015893], [75.76178749929369, 11.341351000348425], [75.76123149973398, 11.341255400616319], [75.75992409951766, 11.340680800378664], [75.7582560999391, 11.340084100201125], [75.75579909994855, 11.339443100318874], [75.75345479939955, 11.338691700561583], [75.7504374992912, 11.337419399985379], [75.74894069915399, 11.336322200109521], [75.74844719977852, 11.335733100102516], [75.7477173999381, 11.335388600403633], [75.74696289931842, 11.33615000062207]]]}}]};
+const CLASSIFIERS = [{"Model": "Logistic Regression", "F1 (CV)": 0.854, "ROC-AUC": 0.906, "PR-AUC (AP)": 0.908, "TN": 18, "FP": 11, "FN": 1, "TP": 35}, {"Model": "Naive Bayes", "F1 (CV)": 0.837, "ROC-AUC": 0.905, "PR-AUC (AP)": 0.906, "TN": 15, "FP": 14, "FN": 0, "TP": 36}, {"Model": "Random Forest", "F1 (CV)": 0.741, "ROC-AUC": 0.787, "PR-AUC (AP)": 0.796, "TN": 14, "FP": 15, "FN": 6, "TP": 30}, {"Model": "SVM (linear)", "F1 (CV)": 0.84, "ROC-AUC": 0.91, "PR-AUC (AP)": 0.915, "TN": 18, "FP": 11, "FN": 2, "TP": 34}];
+const FEATURES = [{"Group": "LR -> FLOOD-RISK", "Feature": "alert", "Weight": 0.3679}, {"Group": "LR -> FLOOD-RISK", "Feature": "districts", "Weight": 0.3055}, {"Group": "LR -> FLOOD-RISK", "Feature": "district", "Weight": 0.3012}, {"Group": "LR -> FLOOD-RISK", "Feature": "monsoon", "Weight": 0.299}, {"Group": "LR -> FLOOD-RISK", "Feature": "red", "Weight": 0.2573}, {"Group": "LR -> FLOOD-RISK", "Feature": "overflow", "Weight": 0.2493}, {"Group": "LR -> FLOOD-RISK", "Feature": "downpour", "Weight": 0.2487}, {"Group": "LR -> FLOOD-RISK", "Feature": "rescue", "Weight": 0.2476}, {"Group": "LR -> FLOOD-RISK", "Feature": "overnight", "Weight": 0.2446}, {"Group": "LR -> FLOOD-RISK", "Feature": "kozhikode district", "Weight": 0.243}, {"Group": "LR -> FLOOD-RISK", "Feature": "heavy", "Weight": 0.2228}, {"Group": "LR -> FLOOD-RISK", "Feature": "rainfall", "Weight": 0.2116}, {"Group": "LR -> NOT flood-risk", "Feature": "festival", "Weight": -0.514}, {"Group": "LR -> NOT flood-risk", "Feature": "new", "Weight": -0.3612}, {"Group": "LR -> NOT flood-risk", "Feature": "beach", "Weight": -0.3227}, {"Group": "LR -> NOT flood-risk", "Feature": "kozhikode beach", "Weight": -0.3227}, {"Group": "LR -> NOT flood-risk", "Feature": "wins state", "Weight": -0.2689}, {"Group": "LR -> NOT flood-risk", "Feature": "wins", "Weight": -0.2689}, {"Group": "LR -> NOT flood-risk", "Feature": "state", "Weight": -0.2689}, {"Group": "LR -> NOT flood-risk", "Feature": "year", "Weight": -0.2287}, {"Group": "LR -> NOT flood-risk", "Feature": "confirms", "Weight": -0.2196}, {"Group": "LR -> NOT flood-risk", "Feature": "inaugurated kozhikode", "Weight": -0.218}, {"Group": "LR -> NOT flood-risk", "Feature": "inaugurated", "Weight": -0.218}, {"Group": "LR -> NOT flood-risk", "Feature": "sees", "Weight": -0.2179}, {"Group": "Random Forest importance", "Feature": "kozhikode", "Weight": 0.0344}, {"Group": "Random Forest importance", "Feature": "festival", "Weight": 0.0225}, {"Group": "Random Forest importance", "Feature": "alert", "Weight": 0.0173}, {"Group": "Random Forest importance", "Feature": "monsoon", "Weight": 0.0129}, {"Group": "Random Forest importance", "Feature": "water", "Weight": 0.0119}, {"Group": "Random Forest importance", "Feature": "district", "Weight": 0.0113}, {"Group": "Random Forest importance", "Feature": "new", "Weight": 0.011}, {"Group": "Random Forest importance", "Feature": "flood", "Weight": 0.0109}, {"Group": "Random Forest importance", "Feature": "beach", "Weight": 0.0103}, {"Group": "Random Forest importance", "Feature": "kozhikode beach", "Weight": 0.0097}, {"Group": "Random Forest importance", "Feature": "near", "Weight": 0.0094}, {"Group": "Random Forest importance", "Feature": "districts", "Weight": 0.0083}];
+const FUSION_ROWS = [{"Scenario": "Strong NLP signal, dry weather", "w_nlp": 0.35, "w_rain": 0.4, "NLP_in": 85, "Rain_in": 5, "Fused": 69.8, "Alert": "ORANGE"}, {"Scenario": "Strong NLP signal, dry weather", "w_nlp": 0.45, "w_rain": 0.3, "NLP_in": 85, "Rain_in": 5, "Fused": 77.8, "Alert": "RED"}, {"Scenario": "Strong NLP signal, dry weather", "w_nlp": 0.55, "w_rain": 0.2, "NLP_in": 85, "Rain_in": 5, "Fused": 85.8, "Alert": "RED"}, {"Scenario": "Weak NLP signal, heavy rain", "w_nlp": 0.35, "w_rain": 0.4, "NLP_in": 30, "Rain_in": 60, "Fused": 72.5, "Alert": "ORANGE"}, {"Scenario": "Weak NLP signal, heavy rain", "w_nlp": 0.45, "w_rain": 0.3, "NLP_in": 30, "Rain_in": 60, "Fused": 69.5, "Alert": "ORANGE"}, {"Scenario": "Weak NLP signal, heavy rain", "w_nlp": 0.55, "w_rain": 0.2, "NLP_in": 30, "Rain_in": 60, "Fused": 66.5, "Alert": "ORANGE"}, {"Scenario": "Moderate NLP, moderate rain", "w_nlp": 0.35, "w_rain": 0.4, "NLP_in": 55, "Rain_in": 30, "Fused": 69.2, "Alert": "ORANGE"}, {"Scenario": "Moderate NLP, moderate rain", "w_nlp": 0.45, "w_rain": 0.3, "NLP_in": 55, "Rain_in": 30, "Fused": 71.8, "Alert": "ORANGE"}, {"Scenario": "Moderate NLP, moderate rain", "w_nlp": 0.55, "w_rain": 0.2, "NLP_in": 55, "Rain_in": 30, "Fused": 74.2, "Alert": "ORANGE"}];
+const REVIEW_QUEUE = [{"review_id": 1, "locality": "Mavoor Road", "fused_score": 77.75, "alert_band": "RED", "nlp_score": 85.0, "rain_score": 5.0, "status": "CONFIRMED", "cleared_for_public_alert": 1, "queued_at": "2026-08-02 19:24:27", "reviewed_by": "ICCC Duty Officer - R. Nair", "reviewed_at": "2026-08-02 19:24:27", "reviewer_notes": "Traffic police confirmed waterlogging on Mavoor Road, 18:40."}, {"review_id": 2, "locality": "Kallai", "fused_score": 69.5, "alert_band": "ORANGE", "nlp_score": 30.0, "rain_score": 60.0, "status": "REJECTED", "cleared_for_public_alert": 0, "queued_at": "2026-08-02 19:24:27", "reviewed_by": "Field Staff - K. Menon", "reviewed_at": "2026-08-02 19:24:27", "reviewer_notes": "Site check at 19:05 found no waterlogging - false alarm."}, {"review_id": 3, "locality": "SM Street", "fused_score": 71.75, "alert_band": "ORANGE", "nlp_score": 55.0, "rain_score": 30.0, "status": "CONFIRMED", "cleared_for_public_alert": 1, "queued_at": "2026-08-02 19:24:27", "reviewed_by": "Ward Officer - Ward 12", "reviewed_at": "2026-08-02 19:24:27", "reviewer_notes": "Minor flooding near SM Street junction confirmed by ward officer."}, {"review_id": 4, "locality": "Beypore", "fused_score": 81.0, "alert_band": "RED", "nlp_score": 80.0, "rain_score": 15.0, "status": "PENDING_REVIEW", "cleared_for_public_alert": 0, "queued_at": "2026-08-02 18:59:27", "reviewed_by": NaN, "reviewed_at": NaN, "reviewer_notes": NaN}];
+const DISSEMINATION_LOG = [{"dissemination_id": 1, "review_id": 1, "tier": "Tier 2 - public", "channel": "SMS cell-broadcast (public)", "message_summary": "RED alert confirmed for Mavoor Road (score 77.8)", "sent_at": "2026-08-02 19:24:27"}, {"dissemination_id": 2, "review_id": 1, "tier": "Tier 2 - public", "channel": "Official social media post", "message_summary": "RED alert confirmed for Mavoor Road (score 77.8)", "sent_at": "2026-08-02 19:24:27"}, {"dissemination_id": 3, "review_id": 1, "tier": "Tier 2 - public", "channel": "Ward loudspeaker announcement", "message_summary": "RED alert confirmed for Mavoor Road (score 77.8)", "sent_at": "2026-08-02 19:24:27"}, {"dissemination_id": 4, "review_id": 3, "tier": "Tier 2 - public", "channel": "In-app push notification (advisory)", "message_summary": "ORANGE alert confirmed for SM Street (score 71.8)", "sent_at": "2026-08-02 19:24:27"}, {"dissemination_id": 5, "review_id": 3, "tier": "Tier 2 - public", "channel": "Local ward WhatsApp group (advisory)", "message_summary": "ORANGE alert confirmed for SM Street (score 71.8)", "sent_at": "2026-08-02 19:24:27"}];
+const CITY_WIDE_ALERTS = [{"Date": "2025-05-23", "Title": "IMD issues orange alert for Kozhikode as monsoon intensifies across northern Kerala districts", "NLP_Confidence": 62.8}, {"Date": "2025-05-26", "Title": "Kozhikode coast placed under red alert as early monsoon brings high wave warnings", "NLP_Confidence": 62.2}, {"Date": "2025-05-24", "Title": "Southwest monsoon arrives over Kerala eight days early, heaviest since 2009, Kozhikode among affected coastal districts", "NLP_Confidence": 62.0}, {"Date": "2025-06-15", "Title": "Thousands evacuated from low-lying Kozhikode neighbourhoods as monsoon flooding overwhelms drainage systems", "NLP_Confidence": 60.7}, {"Date": "2025-07-02", "Title": "Dam authorities release water from key reservoirs as Kerala monsoon rainfall intensifies, Kozhikode on alert", "NLP_Confidence": 62.9}, {"Date": "2026-07-07", "Title": "IMD red warning issued for Kozhikode and Wayanad districts as extremely heavy rainfall recorded", "NLP_Confidence": 62.7}, {"Date": "2026-07-07", "Title": "Automatic weather stations in Kozhikode district record some of the season's heaviest rainfall readings", "NLP_Confidence": 59.5}, {"Date": "2026-07-08", "Title": "Schools shut in Kozhikode and Wayanad as IMD issues yellow alert across eleven Kerala districts", "NLP_Confidence": 63.4}, {"Date": "2026-07-08", "Title": "Authorities open shutters of Oorkadavu regulator-cum-bridge as river levels rise near Kozhikode", "NLP_Confidence": 61.0}, {"Date": "2026-07-18", "Title": "Kerala remains on alert as yellow warning extends toward Kozhikode and Idukki through July 23", "NLP_Confidence": 61.4}, {"Date": "2026-07-18", "Title": "Thunderstorms and frequent lightning forecast to continue over Kozhikode district into next week", "NLP_Confidence": 60.4}, {"Date": "", "Title": "KSDMA warns of flash flood risk in Kozhikode for next 48 hours", "NLP_Confidence": 61.1}, {"Date": "", "Title": "Heavy downpour triggers landslide warning near Kozhikode hills", "NLP_Confidence": 62.7}, {"Date": "", "Title": "NDRF team deployed for flood rescue operations in Kozhikode district", "NLP_Confidence": 63.2}, {"Date": "", "Title": "District collector declares school holiday for Kozhikode due to flood threat", "NLP_Confidence": 61.5}, {"Date": "", "Title": "Railway services disrupted as tracks near Kozhikode go under water", "NLP_Confidence": 61.5}, {"Date": "", "Title": "Kerala Disaster Management Authority activates flood control room in Kozhikode", "NLP_Confidence": 60.0}, {"Date": "", "Title": "Kozhikode Corporation deploys emergency pumps to clear waterlogged roads overnight", "NLP_Confidence": 58.0}, {"Date": "", "Title": "Red alert issued for Kozhikode as dam shutters opened amid heavy inflow", "NLP_Confidence": 62.9}, {"Date": "", "Title": "Coastal fishing suspended near Kozhikode as high waves accompany flood warning", "NLP_Confidence": 61.4}, {"Date": "", "Title": "Kozhikode district administration sets up relief camps as rain-related flooding spreads", "NLP_Confidence": 59.9}, {"Date": "", "Title": "Landslide risk prompts overnight evacuation advisory for hilly parts of Kozhikode district", "NLP_Confidence": 62.9}, {"Date": "", "Title": "Power supply disrupted in several Kozhikode wards as flood water reaches transformers", "NLP_Confidence": 60.4}, {"Date": "2026-08-01", "Title": "IMD issues red alert for Kozhikode among eight Kerala districts as monsoon rains trigger landslides", "NLP_Confidence": 63.5}];
+
+document.getElementById('asof').textContent = 'n=64 · generated ' + new Date().toISOString().slice(0,10);
+document.getElementById('genstamp').textContent = 'build ' + new Date().toISOString();
+
+// ---------- Stat strip ----------
+(function(){
+  const total = HEADLINES.length;
+  const flood = HEADLINES.filter(h=>h.Label===1).length;
+  const real = HEADLINES.filter(h=>h.SourceType==='real-dated').length;
+  const bestAuc = Math.max(...CLASSIFIERS.map(c=>c['ROC-AUC']));
+  const bestModel = CLASSIFIERS.find(c=>c['ROC-AUC']===bestAuc).Model;
+
+  const stats = [
+    {label:'Labelled headlines', value:total, sub: real+' real-dated · '+(total-real)+' synthetic', accent:'var(--teal)'},
+    {label:'Flood-risk rate', value: Math.round(flood/total*100)+'%', sub: flood+' of '+total+' rows labelled flood-risk', accent:'var(--red)'},
+    {label:'Best ROC-AUC', value: bestAuc.toFixed(3), sub: bestModel+' · 5-fold stratified CV', accent:'var(--green)'},
+    {label:'Monitored localities', value: Object.keys(LOCALITIES).length, sub: '3 coordinates corrected from source dict', accent:'var(--yellow)'},
+  ];
+  const el = document.getElementById('statStrip');
+  el.innerHTML = stats.map(s=>`
+    <div class="stat-card" style="--accent:${s.accent}">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-sub">${s.sub}</div>
+    </div>`).join('');
+})();
+
+// ---------- Classifier bars ----------
+(function(){
+  const maxAuc = 1;
+  const colors = ['var(--teal)','var(--yellow)','var(--orange)','var(--red)'];
+  const el = document.getElementById('modelBars');
+  el.innerHTML = CLASSIFIERS.map((c,i)=>`
+    <div class="model-row">
+      <div class="model-name">${c.Model}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${c['ROC-AUC']*100}%; background:${colors[i%4]}"></div></div>
+      <div class="model-val">${c['ROC-AUC'].toFixed(3)}</div>
+    </div>`).join('') + `<div style="font-size:11px;color:var(--muted-dim);margin-top:4px;">bars show ROC-AUC · F1 range ${Math.min(...CLASSIFIERS.map(c=>c['F1 (CV)']))}&ndash;${Math.max(...CLASSIFIERS.map(c=>c['F1 (CV)']))}</div>`;
+})();
+
+// ---------- Feature bars ----------
+(function(){
+  const pos = FEATURES.filter(f=>f.Group==='LR -> FLOOD-RISK').slice(0,8);
+  const neg = FEATURES.filter(f=>f.Group==='LR -> NOT flood-risk').slice(0,8);
+  const maxW = Math.max(...pos.map(f=>Math.abs(f.Weight)), ...neg.map(f=>Math.abs(f.Weight)));
+  const rows = [];
+  for(let i=0;i<Math.max(pos.length,neg.length);i++){
+    if(pos[i]) rows.push({word:pos[i].Feature, w:pos[i].Weight, cls:'pos'});
+  }
+  for(let i=0;i<neg.length;i++){
+    rows.push({word:neg[i].Feature, w:neg[i].Weight, cls:'neg'});
+  }
+  const el = document.getElementById('featBars');
+  el.innerHTML = rows.map(r=>{
+    const pct = Math.abs(r.w)/maxW*50;
+    return `<div class="feat-row">
+      <div class="feat-word">${r.word}</div>
+      <div class="feat-bar-wrap"><div class="feat-mid"></div><div class="feat-bar ${r.cls}" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+})();
+
+// ---------- Trend chart + filtered table ----------
+let trendChart;
+function currentFilters(){
+  const cls = document.querySelector('#classRadio label.active').dataset.val;
+  const loc = document.getElementById('localitySelect').value;
+  const conf = parseFloat(document.getElementById('confSlider').value);
+  return {cls, loc, conf};
+}
+
+function applyFilters(){
+  const {cls, loc, conf} = currentFilters();
+  return HEADLINES.filter(h=>{
+    if(cls!=='all' && String(h.Label)!==cls) return false;
+    if(loc!=='all' && h.Matched_Localities!==loc) return false;
+    if(h.NLP_Confidence < conf) return false;
+    return true;
+  });
+}
+
+function renderTrend(){
+  const rows = applyFilters().filter(h=>h.SourceType==='real-dated' && h.Date);
+  const byDate = {};
+  rows.forEach(h=>{ (byDate[h.Date] = byDate[h.Date] || []).push(h); });
+  const dates = Object.keys(byDate).sort();
+  const avgConf = dates.map(d => byDate[d].reduce((s,h)=>s+h.NLP_Confidence,0) / byDate[d].length);
+  const counts = dates.map(d => byDate[d].length);
+  const floodCounts = dates.map(d => byDate[d].filter(h=>h.Label===1).length);
+
+  const ctx = document.getElementById('trendChart');
+  const data = {
+    labels: dates,
+    datasets: [
+      {
+        type: 'bar',
+        label: 'Headlines that day',
+        data: counts,
+        backgroundColor: dates.map((d,i) => floodCounts[i] > 0 ? 'rgba(196,48,43,0.35)' : 'rgba(14,124,134,0.25)'),
+        borderRadius: 4,
+        yAxisID: 'yCount',
+        order: 2,
+      },
+      {
+        type: 'line',
+        label: 'Avg NLP confidence',
+        data: avgConf,
+        borderColor: '#0E7C86',
+        backgroundColor: '#0E7C86',
+        pointBackgroundColor: dates.map((d,i) => floodCounts[i] > 0 ? '#C4302B' : '#178A52'),
+        pointBorderColor: '#0E7C86',
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        tension: 0.3,
+        yAxisID: 'yConf',
+        order: 1,
+      }
+    ]
+  };
+  const opts = {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: true, labels: { color: '#5B6B7E', font: { size: 11 }, boxWidth: 12 } },
+      tooltip: {
+        backgroundColor: '#16202C', borderColor: '#DEE6EE', borderWidth: 1, padding: 10,
+        titleFont: { family: 'IBM Plex Mono' }, bodyFont: { family: 'Inter' },
+        callbacks: {
+          title: (items) => items[0].label,
+          label: (item) => item.dataset.label === 'Headlines that day'
+            ? `${item.raw} headline(s), ${floodCounts[item.dataIndex]} flood-risk`
+            : `avg confidence ${item.raw.toFixed(1)}`,
+          afterBody: (items) => byDate[dates[items[0].dataIndex]].slice(0, 3)
+            .map(h => '\u2022 ' + (h.Title.length > 60 ? h.Title.slice(0, 60) + '\u2026' : h.Title)),
+        }
+      }
+    },
+    scales: {
+      x: { ticks: { color: '#5B6B7E', font: { size: 10 } }, grid: { display: false } },
+      yCount: { position: 'left', beginAtZero: true, ticks: { color: '#5B6B7E', font: { size: 10 }, stepSize: 1 }, grid: { color: '#E9EEF3' }, title: { display: true, text: 'Headlines', color: '#5B6B7E', font: { size: 10 } } },
+      yConf: { position: 'right', ticks: { color: '#5B6B7E', font: { size: 10 } }, grid: { display: false }, title: { display: true, text: 'Avg NLP confidence', color: '#5B6B7E', font: { size: 10 } } },
+    }
+  };
+  if (trendChart) { trendChart.data = data; trendChart.options = opts; trendChart.update(); }
+  else { trendChart = new Chart(ctx, { type: 'bar', data, options: opts }); }
+}
+
+
+function renderTable(){
+  const rows = applyFilters().sort((a,b)=> (b.Date||'0').localeCompare(a.Date||'0'));
+  const el = document.getElementById('headlineRows');
+  el.innerHTML = rows.map(h=>`
+    <tr>
+      <td class="mono" style="white-space:nowrap;color:var(--muted)">${h.Date || '—'}</td>
+      <td class="headline-cell" title="${h.Title.replace(/"/g,'&quot;')}">${h.Title.length>78 ? h.Title.slice(0,78)+'…' : h.Title}</td>
+      <td><span class="tag ${h.Label===1?'flood':'notflood'}">${h.Label===1?'Flood':'Not flood'}</span></td>
+      <td class="mono">${h.NLP_Confidence.toFixed(1)}</td>
+      <td class="${h.SourceType==='real-dated'?'source-real':'source-synth'}">${h.SourceType==='real-dated'?'RSS real':'synthetic'}</td>
+    </tr>`).join('') || '<tr><td colspan="5" style="color:var(--muted-dim);padding:20px;text-align:center;">No headlines match these filters.</td></tr>';
+}
+
+function renderAll(){ renderTrend(); renderTable(); }
+
+// Populate locality select
+(function(){
+  const el = document.getElementById('localitySelect');
+  const used = [...new Set(HEADLINES.map(h=>h.Matched_Localities).filter(Boolean))].sort();
+  el.innerHTML = '<option value="all">All localities</option>' + used.map(l=>`<option value="${l}">${l}</option>`).join('');
+  el.addEventListener('change', renderAll);
+})();
+
+// Class radio behaviour
+document.querySelectorAll('#classRadio label').forEach(l=>{
+  l.addEventListener('click', ()=>{
+    document.querySelectorAll('#classRadio label').forEach(x=>x.classList.remove('active'));
+    l.classList.add('active');
+    renderAll();
+  });
+});
+
+// Confidence slider
+document.getElementById('confSlider').addEventListener('input', (e)=>{
+  document.getElementById('confLabel').textContent = e.target.value;
+  renderAll();
+});
+
+renderAll();
+
+// ---------- Live pipeline check ----------
+// Tries to fetch a location_summary.json written by run_uffis_pipeline.py (see the
+// GitHub Actions workflow alongside that script). If it's not there - which is the
+// normal case when this file was opened on its own - falls back honestly to saying
+// so, instead of pretending to be live when it isn't.
+let LIVE_SNAPSHOT = null;
+fetch('location_summary.json', { cache: 'no-store' })
+  .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
+  .then(data => {
+    LIVE_SNAPSHOT = data;
+    const genAt = new Date(data.generated_at);
+    const ageMin = Math.round((Date.now() - genAt.getTime()) / 60000);
+    document.getElementById('pipelineDot').style.background = 'var(--green)';
+    document.getElementById('pipelineText').textContent =
+      `Live pipeline data \u2014 ${ageMin} min old (${data.live_headlines_fetched} headlines fetched)`;
+    applyLiveOverlay(data);
+  })
+  .catch(() => {
+    document.getElementById('pipelineDot').style.background = 'var(--muted-dim)';
+    document.getElementById('pipelineText').textContent =
+      'No live pipeline data found \u2014 showing the notebook\u2019s last static run';
+  });
+
+function applyLiveOverlay(data){
+  // Overlay live per-locality bands onto the map markers, on top of the static
+  // "matched in a headline" coloring already drawn.
+  if (!window.__uffisMapMarkers) return;
+  Object.entries(data.localities || {}).forEach(([name, info]) => {
+    const marker = window.__uffisMapMarkers[name];
+    if (!marker) return;
+    const bandColor = { RED:'#C4302B', ORANGE:'#C45E0A', YELLOW:'#B7860B', GREEN:'#178A52' }[info.alert_band] || '#0E7C86';
+    marker.setStyle({ color: bandColor, fillColor: bandColor });
+    marker.bindTooltip(`${name} \u2014 live: ${info.alert_band} (${info.fused_score}) \u00b7 ${info.review_status}`, { direction: 'top' });
+  });
+}
+
+// ---------- Fusion console ----------
+const SCENARIOS = {};
+FUSION_ROWS.forEach(r=>{ SCENARIOS[r.Scenario] = {nlp:r.NLP_in, rain:r.Rain_in}; });
+
+
+(function(){
+  const sel = document.getElementById('scenarioSelect');
+  sel.innerHTML = Object.keys(SCENARIOS).map(s=>`<option value="${s}">${s}</option>`).join('');
+})();
+
+function alertBand(score){
+  if(score<25) return {name:'GREEN', color:'var(--green)'};
+  if(score<50) return {name:'YELLOW', color:'var(--yellow)'};
+  if(score<75) return {name:'ORANGE', color:'var(--orange)'};
+  return {name:'RED', color:'var(--red)'};
+}
+
+function updateConsole(){
+  const scenario = document.getElementById('scenarioSelect').value;
+  const wNlp = parseFloat(document.getElementById('wNlp').value);
+  const wRain = parseFloat(document.getElementById('wRain').value);
+  document.getElementById('wNlpVal').textContent = wNlp.toFixed(2);
+  document.getElementById('wRainVal').textContent = wRain.toFixed(2);
+
+  const {nlp, rain} = SCENARIOS[scenario];
+  const bonus = 8+10+10+10;
+  let fused = wNlp*nlp + wRain*rain + bonus;
+  fused = Math.max(0, Math.min(100, fused));
+  const band = alertBand(fused);
+
+  document.getElementById('readoutScore').textContent = fused.toFixed(1);
+  document.getElementById('readoutScore').style.color = band.color;
+  const bandEl = document.getElementById('readoutBand');
+  bandEl.textContent = band.name;
+  bandEl.style.color = band.color;
+  bandEl.style.background = band.color.replace('var(','rgba(').replace(')','').trim(); // fallback, overridden below
+  bandEl.style.background = 'transparent';
+  bandEl.style.border = '1px solid '+band.color;
+
+  document.getElementById('readoutDetail').innerHTML = `NLP input <span class="mono">${nlp}</span> · Rain input <span class="mono">${rain}</span><br>Fixed bonuses (corrob.+cred.+gdacs+loc.) = <span class="mono">${bonus}</span>`;
+
+  // Warn if this scenario flips band across the tested 0.35-0.55 range
+  const lo = alertBand(0.35*nlp + 0.40*rain + bonus).name;
+  const hi = alertBand(0.55*nlp + 0.20*rain + bonus).name;
+  document.getElementById('readoutWarning').style.display = (lo!==hi) ? 'block' : 'none';
+}
+document.getElementById('scenarioSelect').addEventListener('change', updateConsole);
+document.getElementById('wNlp').addEventListener('input', updateConsole);
+document.getElementById('wRain').addEventListener('input', updateConsole);
+updateConsole();
+
+// ---------- Map ----------
+(function(){
+  const map = L.map('map', {scrollWheelZoom:false}).setView([11.258, 75.780], 12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom:19
+  }).addTo(map);
+
+  L.geoJSON(BOUNDARY, {
+    style: { color:'#0E7C86', weight:2, fillColor:'#0E7C86', fillOpacity:0.06 }
+  }).addTo(map);
+
+  const matched = new Set(HEADLINES.filter(h=>h.Label===1 && h.Matched_Localities).map(h=>h.Matched_Localities));
+  window.__uffisMapMarkers = {};
+
+  Object.entries(LOCALITIES).forEach(([name, coords])=>{
+    const isFlagged = matched.has(name);
+    const marker = L.circleMarker([coords[0], coords[1]], {
+      radius: isFlagged ? 8 : 6,
+      color: isFlagged ? '#C4302B' : '#0E7C86',
+      weight: 2,
+      fillColor: isFlagged ? '#C4302B' : '#0E7C86',
+      fillOpacity: 0.5
+    }).addTo(map).bindTooltip(name + (isFlagged ? ' — flood-risk match' : ''), {direction:'top'});
+    window.__uffisMapMarkers[name] = marker;
+  });
+})();
+
+// ---------- Alerts tab: city-wide alerts (recovered by the locality-extraction fix) ----------
+(function(){
+  const el = document.getElementById("cityWideRows");
+  el.innerHTML = CITY_WIDE_ALERTS.map(h => `
+    <tr>
+      <td class="mono" style="white-space:nowrap;color:var(--muted)">${h.Date || "\u2014"}</td>
+      <td class="headline-cell" title="${h.Title.replace(/"/g,'&quot;')}">${h.Title}</td>
+      <td class="mono">${Number(h.NLP_Confidence).toFixed(1)}</td>
+    </tr>`).join("") || '<tr><td colspan="3" style="color:var(--muted-dim);padding:16px;text-align:center;">None.</td></tr>';
+})();
+
+// ---------- Alerts tab: live, interactive review queue + dissemination ----------
+// State starts as a copy of what Section 10a/10b actually produced in the notebook run;
+// Confirm/Reject and new submissions below only change this in-browser copy, not the .db.
+let reviewState = REVIEW_QUEUE.map(r => ({...r}));
+let disseminationState = DISSEMINATION_LOG.map(d => ({...d}));
+let nextReviewId = Math.max(0, ...reviewState.map(r => r.review_id)) + 1;
+
+const BAND_COLOR = { RED: "var(--red)", ORANGE: "var(--orange)", YELLOW: "var(--yellow)", GREEN: "var(--green)" };
+const STATUS_COLOR = { PENDING_REVIEW: "var(--red)", CONFIRMED: "var(--green)", REJECTED: "var(--muted-dim)", AUTO_INFORMATIONAL: "var(--teal)" };
+const TIER2_CHANNELS = {
+  RED:    ["SMS cell-broadcast (public)", "Official social media post", "Ward loudspeaker announcement"],
+  ORANGE: ["In-app push notification (advisory)", "Local ward WhatsApp group (advisory)"],
+};
+
+function fusedScoreJS(nlp, rain, wNlp=0.45, wRain=0.30){
+  const bonus = 8+10+10+10;
+  return Math.max(0, Math.min(100, wNlp*nlp + wRain*rain + bonus));
+}
+function alertBandJS(score){
+  if(score<25) return "GREEN";
+  if(score<50) return "YELLOW";
+  if(score<75) return "ORANGE";
+  return "RED";
+}
+
+function renderReviewQueue(){
+  const el = document.getElementById("reviewQueueRows");
+  el.innerHTML = reviewState.map(r => {
+    const actions = r.status === "PENDING_REVIEW"
+      ? `<button class="action-btn confirm" onclick="handleDecision(${r.review_id},'CONFIRMED')">Confirm</button>
+         <button class="action-btn reject" onclick="handleDecision(${r.review_id},'REJECTED')">Reject</button>`
+      : `<span style="color:var(--muted-dim);font-size:11px;">&mdash;</span>`;
+    return `
+    <tr id="review-row-${r.review_id}">
+      <td>${r.locality}</td>
+      <td class="mono">${Number(r.fused_score).toFixed(1)}</td>
+      <td><span class="tag" style="background:${BAND_COLOR[r.alert_band]}22;color:${BAND_COLOR[r.alert_band]}">${r.alert_band}</span></td>
+      <td><span class="tag" style="background:${STATUS_COLOR[r.status]}22;color:${STATUS_COLOR[r.status]}">${r.status}</span></td>
+      <td style="color:var(--muted);font-size:11.5px;">${r.reviewed_by || "\u2014"}</td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join("") || '<tr><td colspan="6" style="color:var(--muted-dim);padding:16px;text-align:center;">Queue is empty.</td></tr>';
+
+  const pendingCount = reviewState.filter(r => r.status === "PENDING_REVIEW").length;
+  const badge = document.getElementById("alertsBadge");
+  if (pendingCount > 0) { badge.textContent = pendingCount; badge.classList.add("show"); }
+  else { badge.classList.remove("show"); }
+}
+
+function renderDissemination(){
+  const el = document.getElementById("disseminationRows");
+  el.innerHTML = disseminationState.map(d => `
+    <tr>
+      <td style="color:var(--muted);font-size:11.5px;">${d.tier}</td>
+      <td>${d.channel}</td>
+      <td style="color:var(--muted);font-size:11.5px;">${d.message_summary}</td>
+    </tr>`).join("") || '<tr><td colspan="3" style="color:var(--muted-dim);padding:16px;text-align:center;">No dissemination yet.</td></tr>';
+}
+
+function handleDecision(reviewId, decision){
+  const row = reviewState.find(r => r.review_id === reviewId);
+  if (!row) return;
+  const reviewerName = prompt(
+    `${decision === "CONFIRMED" ? "Confirming" : "Rejecting"} the ${row.alert_band} reading for ${row.locality}.\n` +
+    `Enter reviewer name/role (e.g. "Traffic Police - Zone 3" or "Field Staff - K. Menon"):`,
+    "ICCC Duty Officer"
+  );
+  if (reviewerName === null) return; // cancelled
+
+  row.status = decision;
+  row.reviewed_by = reviewerName || "Unnamed reviewer";
+  row.cleared_for_public_alert = decision === "CONFIRMED" ? 1 : 0;
+
+  if (decision === "CONFIRMED") {
+    (TIER2_CHANNELS[row.alert_band] || []).forEach(channel => {
+      disseminationState.push({
+        tier: "Tier 2 - public",
+        channel,
+        message_summary: `${row.alert_band} alert confirmed for ${row.locality} (score ${Number(row.fused_score).toFixed(1)})`,
+      });
+    });
+    renderDissemination();
+  }
+  renderReviewQueue();
+  const flashEl = document.getElementById(`review-row-${reviewId}`);
+  if (flashEl) { flashEl.classList.add("row-flash"); setTimeout(() => flashEl.classList.remove("row-flash"), 1000); }
+}
+
+// ---------- Alerts tab: submit a new reading ----------
+(function(){
+  const sel = document.getElementById("newLocality");
+  sel.innerHTML = Object.keys(LOCALITIES).map(n => `<option value="${n}">${n}</option>`).join("");
+
+  const nlpSlider = document.getElementById("newNlp");
+  const rainSlider = document.getElementById("newRain");
+  nlpSlider.addEventListener("input", () => document.getElementById("newNlpVal").textContent = nlpSlider.value);
+  rainSlider.addEventListener("input", () => document.getElementById("newRainVal").textContent = rainSlider.value);
+
+  document.getElementById("submitReading").addEventListener("click", () => {
+    const locality = sel.value;
+    const nlp = Number(nlpSlider.value);
+    const rain = Number(rainSlider.value);
+    const score = fusedScoreJS(nlp, rain);
+    const band = alertBandJS(score);
+    const status = (band === "ORANGE" || band === "RED") ? "PENDING_REVIEW" : "AUTO_INFORMATIONAL";
+
+    reviewState.push({
+      review_id: nextReviewId++,
+      locality, fused_score: score, alert_band: band, nlp_score: nlp, rain_score: rain,
+      status, cleared_for_public_alert: 0, reviewed_by: null,
+    });
+    renderReviewQueue();
+
+    const preview = document.getElementById("submitPreview");
+    preview.innerHTML = `${locality} &rarr; <b>${score.toFixed(1)}</b> (${band}) &rarr; ` +
+      (status === "PENDING_REVIEW" ? "queued for human review below" : "informational only, not queued");
+  });
+})();
+
+renderReviewQueue();
+renderDissemination();
+
+// ---------- Tab switching ----------
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-overview").style.display = btn.dataset.tab === "overview" ? "" : "none";
+    document.getElementById("tab-alerts").style.display = btn.dataset.tab === "alerts" ? "" : "none";
+  });
+});
+</script>
+</body>
+</html>

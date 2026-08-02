@@ -1,1 +1,52 @@
+name: UFFIS pipeline
 
+# Runs the UFFIS pipeline on a schedule (default: every 15 minutes, matching
+# Open-Meteo's forecast update interval) and commits the refreshed
+# location_summary.json + uffis_data.db back to the repo. GitHub Actions is free
+# for public repos and needs no server of your own — this is the practical way
+# to satisfy "Live pipeline integration" from the Way Forward table without
+# provisioning any cloud infrastructure.
+#
+# Setup:
+#   1. Put this file at .github/workflows/uffis_pipeline.yml in your repo.
+#   2. Put run_uffis_pipeline.py and UFFIS_training_data.csv in the repo root
+#      (or update the paths below to match wherever you keep them).
+#   3. Push. Check the "Actions" tab on GitHub to see it run.
+#   4. If you host the dashboard on GitHub Pages from the same repo, it can
+#      fetch("location_summary.json") directly — see dashboard_template.html
+#      for the fetch-with-fallback snippet that makes this optional, not required.
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 minutes, UTC
+  workflow_dispatch: {}       # lets you trigger a manual run from the Actions tab
+
+permissions:
+  contents: write            # needed to commit the updated snapshot/db back
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install --break-system-packages feedparser numpy pandas scikit-learn
+
+      - name: Run UFFIS pipeline
+        run: python3 run_uffis_pipeline.py
+
+      - name: Commit updated snapshot + database
+        run: |
+          git config user.name "uffis-pipeline-bot"
+          git config user.email "actions@github.com"
+          git add location_summary.json uffis_data.db
+          git diff --quiet --cached || git commit -m "UFFIS pipeline run $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push

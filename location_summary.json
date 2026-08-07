@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-07T20:23:40.227357+00:00",
+  "generated_at": "2026-08-07T22:19:21.097936+00:00",
   "live_headlines_fetched": 75,
   "localities": {
     "Palayam": {
@@ -94,10 +94,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 47.0,
+      "fused_score": 39.7,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 5.6,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
@@ -122,10 +122,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
-      "fused_score": 39.7,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 5.6,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Ashokapuram": {

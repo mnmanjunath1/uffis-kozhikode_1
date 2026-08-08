@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-08T07:36:55.431204+00:00",
+  "generated_at": "2026-08-08T09:23:38.464420+00:00",
   "live_headlines_fetched": 75,
   "localities": {
     "Palayam": {
@@ -59,18 +59,18 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 40.6,
+      "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 8.8,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
-      "fused_score": 73.2,
-      "alert_band": "ORANGE",
-      "nlp_score": 71.2,
+      "fused_score": 41.2,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
       "rain_score": 10.6,
-      "review_status": "PENDING_REVIEW"
+      "review_status": "AUTO_INFORMATIONAL"
     },
     "Mini Bypass": {
       "fused_score": 41.2,
@@ -80,10 +80,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
-      "fused_score": 41.2,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 10.6,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
@@ -122,10 +122,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
-      "fused_score": 47.0,
+      "fused_score": 41.2,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 10.6,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Ashokapuram": {

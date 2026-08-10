@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-10T20:06:36.746854+00:00",
-  "live_headlines_fetched": 78,
+  "generated_at": "2026-08-10T22:19:49.020146+00:00",
+  "live_headlines_fetched": 77,
   "localities": {
     "Palayam": {
       "fused_score": 42.3,
@@ -73,10 +73,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mini Bypass": {
-      "fused_score": 47.0,
+      "fused_score": 42.3,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 14.4,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
@@ -87,9 +87,9 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
-      "fused_score": 42.5,
+      "fused_score": 42.3,
       "alert_band": "YELLOW",
-      "nlp_score": 0.3,
+      "nlp_score": 0.0,
       "rain_score": 14.4,
       "review_status": "AUTO_INFORMATIONAL"
     },
@@ -122,10 +122,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
-      "fused_score": 86.2,
+      "fused_score": 90.9,
       "alert_band": "RED",
       "nlp_score": 97.5,
-      "rain_score": 14.4,
+      "rain_score": 30.0,
       "review_status": "PENDING_REVIEW"
     },
     "Ashokapuram": {

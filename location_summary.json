@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-09T22:59:15.063999+00:00",
+  "generated_at": "2026-08-10T00:05:30.528400+00:00",
   "live_headlines_fetched": 77,
   "localities": {
     "Palayam": {
@@ -115,10 +115,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {
-      "fused_score": 47.0,
+      "fused_score": 38.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 1.2,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
@@ -129,10 +129,10 @@
       "review_status": "PENDING_REVIEW"
     },
     "Ashokapuram": {
-      "fused_score": 38.4,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 1.2,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     }
   }

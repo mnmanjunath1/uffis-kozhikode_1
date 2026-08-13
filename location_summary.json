@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-13T15:36:13.674942+00:00",
-  "live_headlines_fetched": 82,
+  "generated_at": "2026-08-13T18:42:00.000988+00:00",
+  "live_headlines_fetched": 83,
   "localities": {
     "Palayam": {
       "fused_score": 41.9,
@@ -80,10 +80,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
-      "fused_score": 47.0,
+      "fused_score": 41.9,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 13.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-15T08:58:22.570205+00:00",
-  "live_headlines_fetched": 84,
+  "generated_at": "2026-08-15T09:53:47.289636+00:00",
+  "live_headlines_fetched": 0,
   "localities": {
     "Palayam": {
       "fused_score": 38.6,
@@ -17,11 +17,11 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kallai": {
-      "fused_score": 81.1,
-      "alert_band": "RED",
-      "nlp_score": 94.4,
+      "fused_score": 38.6,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
       "rain_score": 1.9,
-      "review_status": "PENDING_REVIEW"
+      "review_status": "AUTO_INFORMATIONAL"
     },
     "Nadakkavu": {
       "fused_score": 38.6,
@@ -59,10 +59,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 38.6,
+      "fused_score": 38.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 1.9,
+      "rain_score": 1.2,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
@@ -87,10 +87,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
-      "fused_score": 47.0,
+      "fused_score": 38.6,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 1.9,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
@@ -108,10 +108,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {
-      "fused_score": 38.6,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 1.9,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {
@@ -122,11 +122,11 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
-      "fused_score": 82.4,
-      "alert_band": "RED",
-      "nlp_score": 97.5,
+      "fused_score": 38.6,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
       "rain_score": 1.9,
-      "review_status": "PENDING_REVIEW"
+      "review_status": "AUTO_INFORMATIONAL"
     },
     "Ashokapuram": {
       "fused_score": 38.6,

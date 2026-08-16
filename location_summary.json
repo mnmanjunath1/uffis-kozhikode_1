@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-16T09:01:16.075711+00:00",
-  "live_headlines_fetched": 82,
+  "generated_at": "2026-08-16T09:58:57.702829+00:00",
+  "live_headlines_fetched": 83,
   "localities": {
     "Palayam": {
       "fused_score": 39.3,
@@ -52,17 +52,17 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "West Hill": {
-      "fused_score": 47.0,
+      "fused_score": 39.3,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 4.4,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 47.0,
+      "fused_score": 39.9,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 6.2,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
@@ -108,10 +108,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {
-      "fused_score": 47.0,
+      "fused_score": 39.3,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 4.4,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-19T21:57:00.222662+00:00",
+  "generated_at": "2026-08-19T22:56:35.139465+00:00",
   "live_headlines_fetched": 73,
   "localities": {
     "Palayam": {
@@ -87,10 +87,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
-      "fused_score": 47.0,
+      "fused_score": 42.3,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 14.4,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {

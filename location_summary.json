@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-19T09:08:37.400828+00:00",
-  "live_headlines_fetched": 75,
+  "generated_at": "2026-08-19T10:14:21.265914+00:00",
+  "live_headlines_fetched": 74,
   "localities": {
     "Palayam": {
       "fused_score": 39.7,
@@ -94,10 +94,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 47.0,
+      "fused_score": 39.7,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 5.6,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {

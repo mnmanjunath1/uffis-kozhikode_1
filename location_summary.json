@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-19T10:14:21.265914+00:00",
-  "live_headlines_fetched": 74,
+  "generated_at": "2026-08-19T11:04:10.070644+00:00",
+  "live_headlines_fetched": 75,
   "localities": {
     "Palayam": {
       "fused_score": 39.7,
@@ -108,10 +108,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {
-      "fused_score": 39.7,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 5.6,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {

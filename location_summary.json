@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-20T11:59:01.935968+00:00",
-  "live_headlines_fetched": 76,
+  "generated_at": "2026-08-20T14:10:29.264216+00:00",
+  "live_headlines_fetched": 77,
   "localities": {
     "Palayam": {
       "fused_score": 38.6,
@@ -59,10 +59,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 38.8,
+      "fused_score": 38.6,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 2.5,
+      "rain_score": 1.9,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
@@ -73,10 +73,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mini Bypass": {
-      "fused_score": 38.6,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 1.9,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {

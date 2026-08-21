@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-20T23:59:53.235013+00:00",
+  "generated_at": "2026-08-21T03:31:53.193760+00:00",
   "live_headlines_fetched": 76,
   "localities": {
     "Palayam": {
@@ -59,10 +59,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 38.6,
+      "fused_score": 38.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 1.9,
+      "rain_score": 1.2,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
@@ -94,17 +94,17 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 47.0,
+      "fused_score": 38.6,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 1.9,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
-      "fused_score": 47.0,
+      "fused_score": 38.6,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 1.9,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-21T20:55:10.670746+00:00",
-  "live_headlines_fetched": 75,
+  "generated_at": "2026-08-21T21:55:45.784825+00:00",
+  "live_headlines_fetched": 0,
   "localities": {
     "Palayam": {
       "fused_score": 39.1,
@@ -17,11 +17,11 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kallai": {
-      "fused_score": 81.6,
-      "alert_band": "RED",
-      "nlp_score": 94.4,
+      "fused_score": 39.1,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
       "rain_score": 3.8,
-      "review_status": "PENDING_REVIEW"
+      "review_status": "AUTO_INFORMATIONAL"
     },
     "Nadakkavu": {
       "fused_score": 39.1,
@@ -122,11 +122,11 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
-      "fused_score": 83.0,
-      "alert_band": "RED",
-      "nlp_score": 97.5,
+      "fused_score": 39.1,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
       "rain_score": 3.8,
-      "review_status": "PENDING_REVIEW"
+      "review_status": "AUTO_INFORMATIONAL"
     },
     "Ashokapuram": {
       "fused_score": 39.1,

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-23T19:02:29.661725+00:00",
-  "live_headlines_fetched": 52,
+  "generated_at": "2026-08-23T19:51:22.377080+00:00",
+  "live_headlines_fetched": 66,
   "localities": {
     "Palayam": {
       "fused_score": 50.2,
@@ -10,9 +10,9 @@
       "review_status": "PENDING_REVIEW"
     },
     "Mavoor Road": {
-      "fused_score": 94.6,
-      "alert_band": "RED",
-      "nlp_score": 98.7,
+      "fused_score": 50.2,
+      "alert_band": "ORANGE",
+      "nlp_score": 0.0,
       "rain_score": 40.6,
       "review_status": "PENDING_REVIEW"
     },
@@ -108,11 +108,11 @@
       "review_status": "PENDING_REVIEW"
     },
     "Arayidathupalam": {
-      "fused_score": 47.0,
-      "alert_band": "YELLOW",
+      "fused_score": 50.2,
+      "alert_band": "ORANGE",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
-      "review_status": "AUTO_INFORMATIONAL"
+      "rain_score": 40.6,
+      "review_status": "PENDING_REVIEW"
     },
     "Kottooli": {
       "fused_score": 50.2,

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-23T10:55:50.939511+00:00",
-  "live_headlines_fetched": 66,
+  "generated_at": "2026-08-23T11:45:45.137488+00:00",
+  "live_headlines_fetched": 0,
   "localities": {
     "Palayam": {
       "fused_score": 39.5,
@@ -17,11 +17,11 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kallai": {
-      "fused_score": 82.0,
-      "alert_band": "RED",
-      "nlp_score": 94.4,
+      "fused_score": 39.5,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
       "rain_score": 5.0,
-      "review_status": "PENDING_REVIEW"
+      "review_status": "AUTO_INFORMATIONAL"
     },
     "Nadakkavu": {
       "fused_score": 39.5,
@@ -101,10 +101,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
-      "fused_score": 47.0,
+      "fused_score": 39.5,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 5.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {
@@ -115,18 +115,18 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {
+      "fused_score": 47.0,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 30.0,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "Vellayil": {
       "fused_score": 39.5,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
       "rain_score": 5.0,
       "review_status": "AUTO_INFORMATIONAL"
-    },
-    "Vellayil": {
-      "fused_score": 83.4,
-      "alert_band": "RED",
-      "nlp_score": 97.5,
-      "rain_score": 5.0,
-      "review_status": "PENDING_REVIEW"
     },
     "Ashokapuram": {
       "fused_score": 39.5,

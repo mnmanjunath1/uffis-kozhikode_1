@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-23T19:51:22.377080+00:00",
+  "generated_at": "2026-08-23T20:53:15.777520+00:00",
   "live_headlines_fetched": 66,
   "localities": {
     "Palayam": {
@@ -73,11 +73,11 @@
       "review_status": "PENDING_REVIEW"
     },
     "Mini Bypass": {
-      "fused_score": 50.2,
-      "alert_band": "ORANGE",
+      "fused_score": 47.0,
+      "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 40.6,
-      "review_status": "PENDING_REVIEW"
+      "rain_score": 30.0,
+      "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
       "fused_score": 50.2,

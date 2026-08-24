@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-24T19:41:00.270087+00:00",
+  "generated_at": "2026-08-24T21:03:13.250100+00:00",
   "live_headlines_fetched": 63,
   "localities": {
     "Palayam": {
@@ -73,10 +73,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mini Bypass": {
-      "fused_score": 47.0,
+      "fused_score": 45.1,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 23.8,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
@@ -129,10 +129,10 @@
       "review_status": "PENDING_REVIEW"
     },
     "Ashokapuram": {
-      "fused_score": 45.1,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 23.8,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     }
   }

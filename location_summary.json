@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-24T16:07:46.655346+00:00",
+  "generated_at": "2026-08-24T17:51:59.096884+00:00",
   "live_headlines_fetched": 63,
   "localities": {
     "Palayam": {
@@ -73,10 +73,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mini Bypass": {
-      "fused_score": 43.6,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 18.8,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
@@ -108,10 +108,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {
-      "fused_score": 47.0,
+      "fused_score": 43.6,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 18.8,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {

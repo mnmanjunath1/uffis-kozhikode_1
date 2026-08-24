@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-24T22:02:11.571317+00:00",
-  "live_headlines_fetched": 63,
+  "generated_at": "2026-08-24T23:02:22.996356+00:00",
+  "live_headlines_fetched": 65,
   "localities": {
     "Palayam": {
       "fused_score": 42.3,
@@ -59,10 +59,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 42.1,
+      "fused_score": 41.9,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 13.8,
+      "rain_score": 13.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
@@ -94,10 +94,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 47.0,
+      "fused_score": 42.3,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 14.4,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
@@ -115,10 +115,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {
-      "fused_score": 42.3,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 14.4,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {

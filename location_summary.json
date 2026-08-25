@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-25T03:16:02.346676+00:00",
-  "live_headlines_fetched": 68,
+  "generated_at": "2026-08-25T05:18:00.491644+00:00",
+  "live_headlines_fetched": 67,
   "localities": {
     "Palayam": {
       "fused_score": 44.8,
@@ -66,10 +66,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
-      "fused_score": 44.8,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 22.5,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mini Bypass": {
@@ -115,10 +115,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {
-      "fused_score": 47.0,
+      "fused_score": 44.8,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 22.5,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {

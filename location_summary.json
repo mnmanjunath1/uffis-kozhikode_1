@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-25T08:01:45.955468+00:00",
-  "live_headlines_fetched": 66,
+  "generated_at": "2026-08-25T10:00:22.231805+00:00",
+  "live_headlines_fetched": 67,
   "localities": {
     "Palayam": {
       "fused_score": 41.2,
@@ -59,10 +59,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 41.9,
+      "fused_score": 42.7,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 13.1,
+      "rain_score": 15.6,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
@@ -80,10 +80,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
-      "fused_score": 47.0,
+      "fused_score": 41.2,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 10.6,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
@@ -108,10 +108,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {
-      "fused_score": 41.2,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 10.6,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {

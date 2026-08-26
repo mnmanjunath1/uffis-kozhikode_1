@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-26T03:36:08.117104+00:00",
-  "live_headlines_fetched": 71,
+  "generated_at": "2026-08-26T05:18:43.919234+00:00",
+  "live_headlines_fetched": 76,
   "localities": {
     "Palayam": {
       "fused_score": 40.1,
@@ -101,10 +101,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
-      "fused_score": 47.0,
+      "fused_score": 40.1,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 6.9,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {
@@ -115,10 +115,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {
-      "fused_score": 40.1,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 6.9,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-26T08:03:50.356688+00:00",
+  "generated_at": "2026-08-26T10:08:37.033642+00:00",
   "live_headlines_fetched": 69,
   "localities": {
     "Palayam": {
@@ -80,10 +80,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
-      "fused_score": 47.0,
+      "fused_score": 38.8,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 2.5,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
@@ -129,10 +129,10 @@
       "review_status": "PENDING_REVIEW"
     },
     "Ashokapuram": {
-      "fused_score": 38.8,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 2.5,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     }
   }

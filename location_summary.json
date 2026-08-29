@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-29T14:51:04.038270+00:00",
+  "generated_at": "2026-08-29T15:06:10.638922+00:00",
   "live_headlines_fetched": 65,
   "localities": {
     "Palayam": {
@@ -94,10 +94,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 38.2,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 0.6,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
@@ -129,10 +129,10 @@
       "review_status": "PENDING_REVIEW"
     },
     "Ashokapuram": {
-      "fused_score": 47.0,
+      "fused_score": 38.2,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 0.6,
       "review_status": "AUTO_INFORMATIONAL"
     }
   }

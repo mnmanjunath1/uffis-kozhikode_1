@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-29T02:36:02.517190+00:00",
-  "live_headlines_fetched": 66,
+  "generated_at": "2026-08-29T02:51:07.412780+00:00",
+  "live_headlines_fetched": 65,
   "localities": {
     "Palayam": {
       "fused_score": 39.5,
@@ -80,10 +80,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
-      "fused_score": 39.5,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 5.0,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
@@ -94,10 +94,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 47.0,
+      "fused_score": 39.5,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 5.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {

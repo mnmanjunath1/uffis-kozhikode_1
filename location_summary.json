@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-29T04:36:34.788556+00:00",
+  "generated_at": "2026-08-29T04:51:09.602350+00:00",
   "live_headlines_fetched": 66,
   "localities": {
     "Palayam": {
@@ -94,10 +94,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 47.0,
+      "fused_score": 39.5,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 5.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
@@ -115,10 +115,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {
-      "fused_score": 39.5,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 5.0,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {

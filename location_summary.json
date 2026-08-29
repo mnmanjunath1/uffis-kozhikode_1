@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-29T05:36:05.499835+00:00",
+  "generated_at": "2026-08-29T05:51:07.115420+00:00",
   "live_headlines_fetched": 66,
   "localities": {
     "Palayam": {
@@ -94,17 +94,17 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 39.5,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 5.0,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "KSRTC": {
       "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
       "rain_score": 30.0,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "KSRTC": {
+      "fused_score": 39.5,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 5.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {

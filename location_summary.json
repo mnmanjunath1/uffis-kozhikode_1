@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-29T23:51:17.658281+00:00",
+  "generated_at": "2026-08-30T00:07:32.920128+00:00",
   "live_headlines_fetched": 65,
   "localities": {
     "Palayam": {
@@ -87,10 +87,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
-      "fused_score": 47.0,
+      "fused_score": 38.2,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 0.6,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
@@ -122,10 +122,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
-      "fused_score": 82.1,
+      "fused_score": 90.9,
       "alert_band": "RED",
       "nlp_score": 97.5,
-      "rain_score": 0.6,
+      "rain_score": 30.0,
       "review_status": "PENDING_REVIEW"
     },
     "Ashokapuram": {

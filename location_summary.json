@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-30T06:06:41.954531+00:00",
+  "generated_at": "2026-08-30T06:21:31.418888+00:00",
   "live_headlines_fetched": 68,
   "localities": {
     "Palayam": {
@@ -66,10 +66,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
-      "fused_score": 38.0,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 0.0,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mini Bypass": {
@@ -101,10 +101,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
-      "fused_score": 47.0,
+      "fused_score": 38.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {

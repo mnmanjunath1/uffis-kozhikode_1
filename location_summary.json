@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-31T01:37:28.536344+00:00",
-  "live_headlines_fetched": 66,
+  "generated_at": "2026-08-31T07:41:28.381994+00:00",
+  "live_headlines_fetched": 65,
   "localities": {
     "Palayam": {
       "fused_score": 38.2,
@@ -59,24 +59,24 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 38.2,
+      "fused_score": 38.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 0.6,
+      "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
-      "fused_score": 38.2,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 0.6,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "Mini Bypass": {
       "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
       "rain_score": 30.0,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "Mini Bypass": {
+      "fused_score": 38.2,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 0.6,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-05T12:26:43.086929+00:00",
-  "live_headlines_fetched": 77,
+  "generated_at": "2026-09-05T15:28:14.960947+00:00",
+  "live_headlines_fetched": 78,
   "localities": {
     "Palayam": {
       "fused_score": 38.0,
@@ -66,11 +66,11 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
-      "fused_score": 38.0,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
+      "fused_score": 52.1,
+      "alert_band": "ORANGE",
+      "nlp_score": 31.3,
       "rain_score": 0.0,
-      "review_status": "AUTO_INFORMATIONAL"
+      "review_status": "PENDING_REVIEW"
     },
     "Mini Bypass": {
       "fused_score": 38.0,
@@ -80,17 +80,17 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
-      "fused_score": 38.0,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 0.0,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
-      "fused_score": 47.1,
+      "fused_score": 38.1,
       "alert_band": "YELLOW",
       "nlp_score": 0.3,
-      "rain_score": 30.0,
+      "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-05T17:31:05.827526+00:00",
+  "generated_at": "2026-09-05T19:31:28.745295+00:00",
   "live_headlines_fetched": 79,
   "localities": {
     "Palayam": {
@@ -59,17 +59,17 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 38.0,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 0.0,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
-      "fused_score": 52.1,
+      "fused_score": 61.1,
       "alert_band": "ORANGE",
       "nlp_score": 31.3,
-      "rain_score": 0.0,
+      "rain_score": 30.0,
       "review_status": "PENDING_REVIEW"
     },
     "Mini Bypass": {
@@ -122,17 +122,17 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
-      "fused_score": 81.9,
+      "fused_score": 90.9,
       "alert_band": "RED",
       "nlp_score": 97.5,
-      "rain_score": 0.0,
+      "rain_score": 30.0,
       "review_status": "PENDING_REVIEW"
     },
     "Ashokapuram": {
-      "fused_score": 38.0,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 0.0,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     }
   }

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-10T23:24:54.191397+00:00",
-  "live_headlines_fetched": 81,
+  "generated_at": "2026-09-11T01:21:37.535782+00:00",
+  "live_headlines_fetched": 80,
   "localities": {
     "Palayam": {
       "fused_score": 38.0,
@@ -73,17 +73,17 @@
       "review_status": "PENDING_REVIEW"
     },
     "Mini Bypass": {
-      "fused_score": 47.0,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 30.0,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "SM Street": {
       "fused_score": 38.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
       "rain_score": 0.0,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "SM Street": {
+      "fused_score": 47.0,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {

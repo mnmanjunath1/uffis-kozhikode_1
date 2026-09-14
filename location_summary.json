@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-14T06:47:30.965461+00:00",
-  "live_headlines_fetched": 82,
+  "generated_at": "2026-09-14T13:42:21.561909+00:00",
+  "live_headlines_fetched": 81,
   "localities": {
     "Palayam": {
       "fused_score": 38.2,
@@ -59,17 +59,17 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 38.4,
+      "fused_score": 38.2,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 1.2,
+      "rain_score": 0.6,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
-      "fused_score": 61.1,
+      "fused_score": 52.3,
       "alert_band": "ORANGE",
       "nlp_score": 31.3,
-      "rain_score": 30.0,
+      "rain_score": 0.6,
       "review_status": "PENDING_REVIEW"
     },
     "Mini Bypass": {
@@ -108,10 +108,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {
-      "fused_score": 38.2,
+      "fused_score": 47.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 0.6,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {

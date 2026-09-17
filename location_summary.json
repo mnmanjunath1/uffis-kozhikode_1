@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-16T21:56:09.984005+00:00",
+  "generated_at": "2026-09-17T00:11:58.690134+00:00",
   "live_headlines_fetched": 81,
   "localities": {
     "Palayam": {
@@ -59,10 +59,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 41.9,
+      "fused_score": 38.8,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 13.1,
+      "rain_score": 2.5,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
@@ -87,17 +87,17 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
-      "fused_score": 41.0,
+      "fused_score": 47.1,
       "alert_band": "YELLOW",
       "nlp_score": 0.3,
-      "rain_score": 9.4,
+      "rain_score": 30.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 47.0,
+      "fused_score": 40.8,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 9.4,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {

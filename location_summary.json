@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-19T21:03:07.419680+00:00",
-  "live_headlines_fetched": 82,
+  "generated_at": "2026-09-19T23:06:10.526263+00:00",
+  "live_headlines_fetched": 81,
   "localities": {
     "Palayam": {
       "fused_score": 42.1,
@@ -66,10 +66,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {
-      "fused_score": 47.0,
+      "fused_score": 42.1,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 13.8,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mini Bypass": {

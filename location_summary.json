@@ -1,138 +1,138 @@
 {
-  "generated_at": "2026-10-14T19:36:06.197017+00:00",
-  "live_headlines_fetched": 34,
+  "generated_at": "2026-10-14T22:39:36.537409+00:00",
+  "live_headlines_fetched": 76,
   "localities": {
     "Palayam": {
-      "fused_score": 39.9,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 6.2,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "Mavoor Road": {
-      "fused_score": 39.9,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 6.2,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "Kallai": {
-      "fused_score": 39.9,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 6.2,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "Nadakkavu": {
-      "fused_score": 39.9,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 6.2,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "Puthiyara": {
-      "fused_score": 39.9,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 6.2,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "Eranhipalam": {
-      "fused_score": 39.9,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 6.2,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "Chevayur": {
-      "fused_score": 39.9,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 6.2,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "West Hill": {
-      "fused_score": 39.9,
-      "alert_band": "YELLOW",
-      "nlp_score": 0.0,
-      "rain_score": 6.2,
-      "review_status": "AUTO_INFORMATIONAL"
-    },
-    "Beypore": {
       "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
       "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
-    "Medical College": {
-      "fused_score": 39.9,
+    "Mavoor Road": {
+      "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 6.2,
+      "rain_score": 8.1,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "Kallai": {
+      "fused_score": 40.4,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 8.1,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "Nadakkavu": {
+      "fused_score": 40.4,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 8.1,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "Puthiyara": {
+      "fused_score": 40.4,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 8.1,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "Eranhipalam": {
+      "fused_score": 40.4,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 8.1,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "Chevayur": {
+      "fused_score": 40.4,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 8.1,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "West Hill": {
+      "fused_score": 40.4,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 8.1,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "Beypore": {
+      "fused_score": 41.0,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 10.0,
+      "review_status": "AUTO_INFORMATIONAL"
+    },
+    "Medical College": {
+      "fused_score": 40.4,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mini Bypass": {
-      "fused_score": 39.9,
+      "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 6.2,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "SM Street": {
-      "fused_score": 47.0,
+      "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
-      "fused_score": 40.0,
+      "fused_score": 40.6,
       "alert_band": "YELLOW",
       "nlp_score": 0.3,
-      "rain_score": 6.2,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Railway Station": {
-      "fused_score": 39.9,
+      "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 6.2,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
-      "fused_score": 39.9,
+      "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 6.2,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Arayidathupalam": {
-      "fused_score": 39.9,
+      "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 6.2,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kottooli": {
-      "fused_score": 39.9,
+      "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 6.2,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
-      "fused_score": 83.7,
+      "fused_score": 84.3,
       "alert_band": "RED",
       "nlp_score": 97.5,
-      "rain_score": 6.2,
+      "rain_score": 8.1,
       "review_status": "PENDING_REVIEW"
     },
     "Ashokapuram": {
-      "fused_score": 39.9,
+      "fused_score": 40.4,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 6.2,
+      "rain_score": 8.1,
       "review_status": "AUTO_INFORMATIONAL"
     }
   }

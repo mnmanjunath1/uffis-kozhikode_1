@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-18T13:26:22.767416+00:00",
+  "generated_at": "2026-10-18T16:44:15.667208+00:00",
   "live_headlines_fetched": 82,
   "localities": {
     "Palayam": {
@@ -73,11 +73,11 @@
       "review_status": "PENDING_REVIEW"
     },
     "Mini Bypass": {
-      "fused_score": 47.0,
-      "alert_band": "YELLOW",
+      "fused_score": 52.6,
+      "alert_band": "ORANGE",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
-      "review_status": "AUTO_INFORMATIONAL"
+      "rain_score": 48.8,
+      "review_status": "PENDING_REVIEW"
     },
     "SM Street": {
       "fused_score": 52.6,
@@ -94,11 +94,11 @@
       "review_status": "PENDING_REVIEW"
     },
     "Railway Station": {
-      "fused_score": 52.6,
-      "alert_band": "ORANGE",
+      "fused_score": 47.0,
+      "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 48.8,
-      "review_status": "PENDING_REVIEW"
+      "rain_score": 30.0,
+      "review_status": "AUTO_INFORMATIONAL"
     },
     "KSRTC": {
       "fused_score": 52.6,

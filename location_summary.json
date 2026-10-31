@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-30T20:52:50.186912+00:00",
-  "live_headlines_fetched": 39,
+  "generated_at": "2026-10-31T00:28:13.490587+00:00",
+  "live_headlines_fetched": 82,
   "localities": {
     "Palayam": {
       "fused_score": 38.0,
@@ -10,11 +10,11 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mavoor Road": {
-      "fused_score": 82.7,
-      "alert_band": "RED",
-      "nlp_score": 99.3,
+      "fused_score": 38.0,
+      "alert_band": "YELLOW",
+      "nlp_score": 0.0,
       "rain_score": 0.0,
-      "review_status": "PENDING_REVIEW"
+      "review_status": "AUTO_INFORMATIONAL"
     },
     "Kallai": {
       "fused_score": 38.0,
@@ -129,10 +129,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Ashokapuram": {
-      "fused_score": 47.0,
+      "fused_score": 38.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     }
   }

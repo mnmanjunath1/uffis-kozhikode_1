@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-07T15:49:52.720454+00:00",
+  "generated_at": "2026-11-07T19:56:14.034773+00:00",
   "live_headlines_fetched": 40,
   "localities": {
     "Palayam": {
@@ -59,10 +59,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Beypore": {
-      "fused_score": 38.9,
+      "fused_score": 39.7,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 3.1,
+      "rain_score": 5.6,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Medical College": {

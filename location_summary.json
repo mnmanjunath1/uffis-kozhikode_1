@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-11T22:57:38.928346+00:00",
-  "live_headlines_fetched": 40,
+  "generated_at": "2026-11-12T03:42:49.656089+00:00",
+  "live_headlines_fetched": 41,
   "localities": {
     "Palayam": {
       "fused_score": 38.0,
@@ -122,10 +122,10 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Vellayil": {
-      "fused_score": 47.0,
+      "fused_score": 38.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Ashokapuram": {

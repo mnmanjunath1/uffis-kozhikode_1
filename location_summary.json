@@ -1,40 +1,40 @@
 {
-  "generated_at": "2026-11-19T18:20:53.216957+00:00",
+  "generated_at": "2026-11-20T00:47:22.035158+00:00",
   "live_headlines_fetched": 32,
   "localities": {
     "Palayam": {
-      "fused_score": 47.0,
+      "fused_score": 38.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Mavoor Road": {
-      "fused_score": 91.7,
+      "fused_score": 82.7,
       "alert_band": "RED",
       "nlp_score": 99.3,
-      "rain_score": 30.0,
+      "rain_score": 0.0,
       "review_status": "PENDING_REVIEW"
     },
     "Kallai": {
-      "fused_score": 47.0,
+      "fused_score": 38.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Nadakkavu": {
-      "fused_score": 47.0,
+      "fused_score": 38.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Puthiyara": {
-      "fused_score": 47.0,
+      "fused_score": 38.0,
       "alert_band": "YELLOW",
       "nlp_score": 0.0,
-      "rain_score": 30.0,
+      "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Eranhipalam": {
@@ -87,9 +87,9 @@
       "review_status": "AUTO_INFORMATIONAL"
     },
     "Kozhikode Beach": {
-      "fused_score": 38.0,
+      "fused_score": 38.1,
       "alert_band": "YELLOW",
-      "nlp_score": 0.0,
+      "nlp_score": 0.3,
       "rain_score": 0.0,
       "review_status": "AUTO_INFORMATIONAL"
     },
